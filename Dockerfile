@@ -1,12 +1,12 @@
 FROM node
 
-RUN mkdir -p /es-json
-ADD package.json /es-json/
+RUN mkdir -p /safehouse
+ADD package.json /safehouse
 
-WORKDIR /es-json/
+WORKDIR /safehouse
 
 RUN npm install
 
-ADD . /es-json/
+ADD . /safehouse/
 
 CMD ./run.sh
