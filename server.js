@@ -35,6 +35,100 @@ app.get('/', function (req, res) {
   res.render('index')
 })
 
+var state = {
+     "doorCamera" : { "color" : "WHITE", "alpha" : 1.0 },
+    "accessPoint" : { "color" : "WHITE", "alpha" : 1.0 },
+       "doorLock" : { "color" : "WHITE", "alpha" : 1.0 }
+}
+
+/* Need to eventually instrument these as well:
+     'miniCamera' : { "color" : "WHITE", "alpha" : 1.0 },
+ 'motionDetector' : { "color" : "WHITE", "alpha" : 1.0 },
+          'lamp1' : { "color" : "WHITE", "alpha" : 1.0 },
+     'blueRange1' : { "color" : "WHITE", "alpha" : 1.0 },
+          'alexa' : { "color" : "WHITE", "alpha" : 1.0 }
+*/
+
+app.get('/state', function (req, res) {
+  res.status(200).json({ success: true, state: state })
+})
+
+var updateStateInterval;
+
+function updateState() {
+
+  // If unknown client attaches to the accessPoint, turn it YELLOW, otherwise make it WHITE
+  es.search({
+    index: 'safehouse-ap-devices-*',
+    type: 'webhook',
+    body: {
+      query: {
+        range: {
+          timestamp: {
+            gte: 'now-5m',
+            lt: 'now'
+          }
+        }
+      }
+    }
+  }).then(function (resp) {
+    var hits = (resp.hits && resp.hits.hits.length) || 0;
+    state["accessPoint"]["color"] = ( hits > 0 ? "YELLOW" : "WHITE" )
+  }, function (err) {
+    if(err) {
+      console.trace(err.message);
+    }
+  })
+
+  // If unauthorized connection to the doorCamera occurs (webcam-pcap-*), turn it YELLOW, otherwise make it WHITE
+  es.search({
+    index: 'webcam-pcap-*',
+    type: 'webhook',
+    body: {
+      query: {
+        range: {
+          timestamp: {
+            gte: 'now-5m',
+            lt: 'now'
+          }
+        }
+      }
+    }
+  }).then(function (resp) {
+    var hits = (resp.hits && resp.hits.hits.length) || 0;
+    state["doorCamera"]["color"] = ( hits > 0 ? "YELLOW" : "WHITE" )
+  }, function (err) {
+    if(err) {
+      console.trace(err.message);
+    }
+  })
+
+  // If doorLock is manually unlocked (door-lock-*), turn it YELLOW, otherwise make it WHITE
+  es.search({
+    index: 'door-lock-*',
+    type: 'webhook',
+    body: {
+      query: {
+        range: {
+          timestamp: {
+            gte: 'now-5m',
+            lt: 'now'
+          }
+        }
+      }
+    }
+  }).then(function (resp) {
+    var hits = (resp.hits && resp.hits.hits.length) || 0;
+    state["doorLock"]["color"] = ( hits > 0 ? "YELLOW" : "WHITE" )
+  }, function (err) {
+    if(err) {
+      console.trace(err.message);
+    }
+  })
+
+}
+updateStateInterval = setInterval(updateState, 5000);
+
 app.get('/recent/:index/:type/:fromtime/:totime', function (req, res) {
   if(req.params) {
     var index = req.params.index

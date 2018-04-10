@@ -37,7 +37,9 @@
     var range = 100.0;
     viewer.camera.lookAt(center, new Cesium.HeadingPitchRange(heading, pitch, range));
 
-    var doorcamera = viewer.entities.add({
+    var devices = {}
+
+    devices["doorCamera"] = viewer.entities.add({
       name : 'doorCamera',
       position: Cesium.Cartesian3.fromDegrees(-82.4374762, 27.9561761, 2.6),
       box : {
@@ -46,9 +48,10 @@
         outline : true,
         outlineColor : Cesium.Color.BLACK
       }
-    });
+    })
 
-    var minicam = viewer.entities.add({
+/*
+    devices.minicam = viewer.entities.add({
       name : 'miniCamera',
       position: Cesium.Cartesian3.fromDegrees(-82.4374720, 27.95624550, 0.5),
       box : {
@@ -58,8 +61,9 @@
         outlineColor : Cesium.Color.BLACK
       }
    });
+*/
 
-   var doorlock = viewer.entities.add({
+   devices["doorLock"] = viewer.entities.add({
      name : 'doorLock',
      position: Cesium.Cartesian3.fromDegrees(-82.4374762, 27.9561791, 1.2),
      box : {
@@ -70,6 +74,7 @@
      }
    });
 
+/*
    var motiondetector = viewer.entities.add({
      name : 'motionDetector',
      position: Cesium.Cartesian3.fromDegrees(-82.4374422, 27.9561921, 1.2),
@@ -80,10 +85,11 @@
        outlineColor : Cesium.Color.BLACK
      }
    });
+*/
 
 /*
    var range3 = viewer.entities.add({
-     name : 'Range3',
+     name : 'range3',
      position: Cesium.Cartesian3.fromDegrees(-82.4374472, 27.95621700, 1.1),
      box : {
        dimensions : new Cesium.Cartesian3(0.25, 0.25, 0.25),
@@ -94,7 +100,7 @@
    });
 */
 
-   var accessPoint = viewer.entities.add({
+   devices["accessPoint"] = viewer.entities.add({
      name : 'accessPoint',
      position: Cesium.Cartesian3.fromDegrees(-82.4374483, 27.9561880, 2.0),
      box : {
@@ -105,8 +111,9 @@
      }
    });
 
+/*
    var lamp = viewer.entities.add({
-     name : 'lamp',
+     name : 'lamp1',
      position: Cesium.Cartesian3.fromDegrees(-82.4374464, 27.9561880, 0.3),
      box : {
         dimensions : new Cesium.Cartesian3(0.25, 0.25, 0.25),
@@ -128,7 +135,7 @@
    });
 
    var Alexa = viewer.entities.add({
-     name : 'Alexa',
+     name : 'alexa',
      position: Cesium.Cartesian3.fromDegrees(-82.4374483, 27.9561640, 0.7),
      box : {
        dimensions : new Cesium.Cartesian3(0.25, 0.25, 0.25),
@@ -137,13 +144,30 @@
        outlineColor : Cesium.Color.BLACK
      }
    });
+*/
 
-   var colorizeTimeout
+   var colorizeInterval
 
    var period = 5000
 
    function colorize() {
+     $.get( "/state", function( data ) {
+       if(data && data.state) {
+         $.each(data.state, function( name, value ) {
+           config = data.state[name]
+           colorname = config["color"]
+           alpha = config["alpha"]
+	   device = devices[name]
+           if(device) {
+             device.box.material = Cesium.Color[colorname].withAlpha(alpha)
+           } else {
+             console.log(`Cannot find device state for ${name}`)
+           }
+	 })
+       }
+     })
 
+/*
      $.get( "/recent/motion/action/now-1m/now", function( data ) {
        if(data && data.hits > 0) {
          doorcamera.box.material = Cesium.Color.RED
@@ -157,11 +181,24 @@
          })
        }
      })
+     $.get( "/recent/minicam-motion/webhook/now-1m/now", function( data ) {
+       if(data && data.hits > 0) {
+         minicam.box.material = Cesium.Color.RED
+       } else {
+         $.get( "/recent/minicam-motion/webhook/now-5m/now", function( data ) {
+           if(data && data.hits > 0) {
+             minicam.box.material = Cesium.Color.ORANGE
+           } else {
+             minicam.box.material = Cesium.Color.GREEN
+           }
+         })
+       }
+     })
+*/
 
-     colorizeTimeout = setTimeout(colorize, period)
    }
 
-   colorizeTimeout = setTimeout(colorize, period)
+   colorizeInterval = setInterval(colorize, period)
 
   </script>
 </body>
