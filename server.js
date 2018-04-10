@@ -63,12 +63,7 @@ function updateState() {
     type: 'webhook',
     body: {
       query: {
-        range: {
-          timestamp: {
-            gte: 'now-5m',
-            lt: 'now'
-          }
-        }
+        range: { timestamp: { gte: 'now-5m', lt: 'now' } }
       }
     }
   }).then(function (resp) {
@@ -86,12 +81,7 @@ function updateState() {
     type: 'webhook',
     body: {
       query: {
-        range: {
-          timestamp: {
-            gte: 'now-5m',
-            lt: 'now'
-          }
-        }
+        range: { timestamp: { gte: 'now-5m', lt: 'now' } }
       }
     }
   }).then(function (resp) {
@@ -108,12 +98,11 @@ function updateState() {
     index: 'door-lock-*',
     type: 'webhook',
     body: {
+      sort: { timestamp: { order: "desc" }},
       query: {
-        range: {
-          timestamp: {
-            gte: 'now-5m',
-            lt: 'now'
-          }
+        bool: {
+          must: { match: { user: "Manual Unlock" } },
+	  filter: [ { range: { timestamp: { gte: 'now-5m', lt: 'now' } } } ]
         }
       }
     }
@@ -129,6 +118,7 @@ function updateState() {
 }
 updateStateInterval = setInterval(updateState, 5000);
 
+// Now that the client is rather simple, this API is no longer needed:
 app.get('/recent/:index/:type/:fromtime/:totime', function (req, res) {
   if(req.params) {
     var index = req.params.index
@@ -152,7 +142,6 @@ app.get('/recent/:index/:type/:fromtime/:totime', function (req, res) {
     data = es.search(query).then(function (resp) {
       var hits = (resp.hits && resp.hits.hits.length) || 0;
       console.log(`GET /recent/${index}/${type}/${fromtime}/${totime} - ${hits} hits`)
-//      console.log(JSON.stringify(resp.hits.hits,null,2))
       res.status(200).json({ success: true, hits: hits, result: resp })
     }, function (err) {
       if(err) {
