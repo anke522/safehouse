@@ -21,7 +21,13 @@
 <body>
   <div id="cesiumContainer"></div>
   <script>
-    var viewer = new Cesium.Viewer('cesiumContainer');
+    var viewer = new Cesium.Viewer('cesiumContainer', {
+      baseLayerPicker: false,
+      imageryProvider: Cesium.createOpenStreetMapImageryProvider({
+          url : 'https://stamen-tiles.a.ssl.fastly.net/toner-background/',
+          credit : 'Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under CC BY SA.'
+      })
+    });
 
     var scene = viewer.scene;
 
