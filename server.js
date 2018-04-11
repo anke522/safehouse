@@ -38,12 +38,12 @@ app.get('/', function (req, res) {
 var state = {
      "doorCamera" : { "color" : "WHITE", "alpha" : 1.0 },
     "accessPoint" : { "color" : "WHITE", "alpha" : 1.0 },
-       "doorLock" : { "color" : "WHITE", "alpha" : 1.0 }
+       "doorLock" : { "color" : "WHITE", "alpha" : 1.0 },
+ 'motionDetector' : { "color" : "WHITE", "alpha" : 1.0 }
 }
 
 /* Need to eventually instrument these as well:
      'miniCamera' : { "color" : "WHITE", "alpha" : 1.0 },
- 'motionDetector' : { "color" : "WHITE", "alpha" : 1.0 },
           'lamp1' : { "color" : "WHITE", "alpha" : 1.0 },
      'blueRange1' : { "color" : "WHITE", "alpha" : 1.0 },
           'alexa' : { "color" : "WHITE", "alpha" : 1.0 }
@@ -114,6 +114,29 @@ function updateState() {
       console.trace(err.message);
     }
   })
+
+  // If motionDetector has triggered (domoticz), turn it YELLOW, otherwise make it WHITE
+  es.search({
+    index: 'domoticz',
+    type: 'notification',
+    body: {
+      query: {
+        bool: {
+          must: { match: { MESSAGE: "swx-u-range-sensor-motion-1 Switch >> ON" } },
+	  filter: [ { range: { date: { gte: 'now-5m', lt: 'now' } } } ]
+        }
+      }
+    }
+  }).then(function (resp) {
+    var hits = (resp.hits && resp.hits.hits.length) || 0;
+    console.log(JSON.stringify(resp.hits.hits,null,2))
+    state["motionDetector"]["color"] = ( hits > 0 ? "YELLOW" : "WHITE" )
+  }, function (err) {
+    if(err) {
+      console.trace(err.message);
+    }
+  })
+
 
 }
 updateStateInterval = setInterval(updateState, 5000);
