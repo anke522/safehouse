@@ -36,17 +36,18 @@ app.get('/', function (req, res) {
 })
 
 var state = {
-     "doorCamera" : { "color" : "WHITE", "alpha" : 1.0 },
-    "accessPoint" : { "color" : "WHITE", "alpha" : 1.0 },
-       "doorLock" : { "color" : "WHITE", "alpha" : 1.0 },
- 'motionDetector' : { "color" : "WHITE", "alpha" : 1.0 }
+     "doorCamera" : { "color" : "BLACK", "alpha" : 1.0, "alphaStart" : 1.0, "alphaEnd" : 0.5 },
+    "accessPoint" : { "color" : "BLACK", "alpha" : 1.0, "alphaStart" : 1.0, "alphaEnd" : 0.5 },
+       "doorLock" : { "color" : "BLACK", "alpha" : 1.0, "alphaStart" : 1.0, "alphaEnd" : 0.5 },
+ 'motionDetector' : { "color" : "BLACK", "alpha" : 1.0, "alphaStart" : 1.0, "alphaEnd" : 0.5 },
+      'safehouse' : { "color" : "WHITE", "alpha" : 1.0, "alphaStart" : 1.0, "alphaEnd" : 0.5 }
 }
 
 /* Need to eventually instrument these as well:
-     'miniCamera' : { "color" : "WHITE", "alpha" : 1.0 },
-          'lamp1' : { "color" : "WHITE", "alpha" : 1.0 },
-     'blueRange1' : { "color" : "WHITE", "alpha" : 1.0 },
-          'alexa' : { "color" : "WHITE", "alpha" : 1.0 }
+     'miniCamera' : { "color" : "BLACK", "alpha" : 1.0 },
+          'lamp1' : { "color" : "BLACK", "alpha" : 1.0 },
+     'blueRange1' : { "color" : "BLACK", "alpha" : 1.0 },
+          'alexa' : { "color" : "BLACK", "alpha" : 1.0 }
 */
 
 app.get('/state', function (req, res) {
@@ -57,43 +58,43 @@ var updateStateInterval;
 
 function updateState() {
 
-  // If unknown client attaches to the accessPoint, turn it YELLOW, otherwise make it WHITE
+  // If unknown client attaches to the accessPoint, turn it YELLOW, otherwise make it BLACK
   es.search({
     index: 'safehouse-ap-devices-*',
     type: 'webhook',
     body: {
       query: {
-        range: { timestamp: { gte: 'now-5m', lt: 'now' } }
+        range: { timestamp: { gte: 'now-15s', lt: 'now' } }
       }
     }
   }).then(function (resp) {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
-    state["accessPoint"]["color"] = ( hits > 0 ? "YELLOW" : "WHITE" )
+    state["accessPoint"]["color"] = ( hits > 0 ? "YELLOW" : "BLACK" )
   }, function (err) {
     if(err) {
       console.trace(err.message);
     }
   })
 
-  // If unauthorized connection to the doorCamera occurs (webcam-pcap-*), turn it YELLOW, otherwise make it WHITE
+  // If unauthorized connection to the doorCamera occurs (webcam-pcap-*), turn it YELLOW, otherwise make it BLACK
   es.search({
     index: 'webcam-pcap-*',
     type: 'webhook',
     body: {
       query: {
-        range: { timestamp: { gte: 'now-5m', lt: 'now' } }
+        range: { timestamp: { gte: 'now-15s', lt: 'now' } }
       }
     }
   }).then(function (resp) {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
-    state["doorCamera"]["color"] = ( hits > 0 ? "YELLOW" : "WHITE" )
+    state["doorCamera"]["color"] = ( hits > 0 ? "YELLOW" : "BLACK" )
   }, function (err) {
     if(err) {
       console.trace(err.message);
     }
   })
 
-  // If doorLock is manually unlocked (door-lock-*), turn it YELLOW, otherwise make it WHITE
+  // If doorLock is manually unlocked (door-lock-*), turn it YELLOW, otherwise make it BLACK
   es.search({
     index: 'door-lock-*',
     type: 'webhook',
@@ -102,20 +103,20 @@ function updateState() {
       query: {
         bool: {
           must: { match: { user: "Manual Unlock" } },
-	  filter: [ { range: { timestamp: { gte: 'now-5m', lt: 'now' } } } ]
+	  filter: [ { range: { timestamp: { gte: 'now-15s', lt: 'now' } } } ]
         }
       }
     }
   }).then(function (resp) {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
-    state["doorLock"]["color"] = ( hits > 0 ? "YELLOW" : "WHITE" )
+    state["doorLock"]["color"] = ( hits > 0 ? "YELLOW" : "BLACK" )
   }, function (err) {
     if(err) {
       console.trace(err.message);
     }
   })
 
-  // If motionDetector has triggered (domoticz), turn it YELLOW, otherwise make it WHITE
+  // If motionDetector has triggered (domoticz), turn it YELLOW, otherwise make it BLACK
   es.search({
     index: 'domoticz',
     type: 'notification',
@@ -123,14 +124,35 @@ function updateState() {
       query: {
         bool: {
           must: { match: { MESSAGE: "swx-u-range-sensor-motion-1 Switch >> ON" } },
-	  filter: [ { range: { date: { gte: 'now-5m', lt: 'now' } } } ]
+	  filter: [ { range: { date: { gte: 'now-15s', lt: 'now' } } } ]
+        }
+      }
+    }
+  }).then(function (resp) {
+    var hits = (resp.hits && resp.hits.hits.length) || 0;
+    state["motionDetector"]["color"] = ( hits > 0 ? "YELLOW" : "BLACK" )
+  }, function (err) {
+    if(err) {
+      console.trace(err.message);
+    }
+  })
+
+  // If David's safehouse algorithm has triggered (sfalgo), turn the safehouse RED, otherwise make it WHITE
+  es.search({
+    index: 'sfalgo',
+    type: '_doc',
+    body: {
+      query: {
+        bool: {
+          must: { match: { Status: '1' } },
+	  filter: [ { range: { DateTime: { gte: 'now-5m', lt: 'now' } } } ]
         }
       }
     }
   }).then(function (resp) {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
     console.log(JSON.stringify(resp.hits.hits,null,2))
-    state["motionDetector"]["color"] = ( hits > 0 ? "YELLOW" : "WHITE" )
+    state["safehouse"]["color"] = ( hits > 0 ? "RED" : "BLACK" )
   }, function (err) {
     if(err) {
       console.trace(err.message);
@@ -140,42 +162,6 @@ function updateState() {
 
 }
 updateStateInterval = setInterval(updateState, 5000);
-
-// Now that the client is rather simple, this API is no longer needed:
-app.get('/recent/:index/:type/:fromtime/:totime', function (req, res) {
-  if(req.params) {
-    var index = req.params.index
-    var type = req.params.type
-    var fromtime = req.params.fromtime
-    var totime = req.params.totime
-    var query = {
-      index: `${index}*`,
-      type: type,
-      body: {
-        query: {
-	  range: {
-            timestamp: {
-              gte: `${fromtime}`,
-              lt: `${totime}`
-            }
-          }
-        }
-      }
-    }
-    data = es.search(query).then(function (resp) {
-      var hits = (resp.hits && resp.hits.hits.length) || 0;
-      console.log(`GET /recent/${index}/${type}/${fromtime}/${totime} - ${hits} hits`)
-      res.status(200).json({ success: true, hits: hits, result: resp })
-    }, function (err) {
-      if(err) {
-        console.trace(err.message);
-      }
-    })
-  } else {
-    console.log(`GET /es/${index}/${type} - Missing parameters`)
-    res.status(404).json({ success: false, message: "Missing parameters" })
-  }
-})
 
 app.post('/', jsonParser, (req, res) => {
   console.log('POST /')

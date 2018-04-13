@@ -22,7 +22,7 @@
   <div id="cesiumContainer"></div>
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer', {
-      baseLayerPicker: false,
+      baseLayerPicker: true,
       imageryProvider: Cesium.createOpenStreetMapImageryProvider({
           url : 'https://stamen-tiles.a.ssl.fastly.net/toner-background/',
           credit : 'Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under CC BY SA.'
@@ -31,9 +31,11 @@
 
     var scene = viewer.scene;
 
+    var devices = {}
+
     var center = Cesium.Cartesian3.fromDegrees(-82.4374762, 27.9561611, 0.0)
     var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(center)
-    var model = scene.primitives.add(Cesium.Model.fromGltf({
+    var devices["safehouse"] = scene.primitives.add(Cesium.Model.fromGltf({
         url : '/models/Global_SOFWERX.glb',
         modelMatrix : modelMatrix,
         scale : 1.0
@@ -43,15 +45,14 @@
     var range = 100.0;
     viewer.camera.lookAt(center, new Cesium.HeadingPitchRange(heading, pitch, range));
 
-    var devices = {}
-
     devices["doorCamera"] = viewer.entities.add({
       name : 'doorCamera',
       position: Cesium.Cartesian3.fromDegrees(-82.4374762, 27.9561761, 2.6),
       box : {
         dimensions : new Cesium.Cartesian3(0.25, 0.25, 0.25),
-        material : Cesium.Color.GREEN.withAlpha(0.5),
+        material : Cesium.Color.BLUE.withAlpha(0.5),
         outline : true,
+	outlineWidth : 8,
         outlineColor : Cesium.Color.BLACK
       }
     })
@@ -62,8 +63,9 @@
       position: Cesium.Cartesian3.fromDegrees(-82.4374720, 27.95624550, 0.5),
       box : {
         dimensions : new Cesium.Cartesian3(0.25, 0.25, 0.25),
-        material : Cesium.Color.GREEN.withAlpha(0.5),
+        material : Cesium.Color.BLUE.withAlpha(0.5),
         outline : true,
+	outlineWidth : 8,
         outlineColor : Cesium.Color.BLACK
       }
    });
@@ -74,24 +76,24 @@
      position: Cesium.Cartesian3.fromDegrees(-82.4374762, 27.9561791, 1.2),
      box : {
        dimensions : new Cesium.Cartesian3(0.25, 0.25, 0.25),
-       material : Cesium.Color.GREEN.withAlpha(0.5),
+       material : Cesium.Color.BLUE.withAlpha(0.5),
        outline : true,
+       outlineWidth : 8,
        outlineColor : Cesium.Color.BLACK
      }
    });
 
-/*
-   var motiondetector = viewer.entities.add({
+   devices["motionDetector"] = viewer.entities.add({
      name : 'motionDetector',
      position: Cesium.Cartesian3.fromDegrees(-82.4374422, 27.9561921, 1.2),
      box : {
        dimensions : new Cesium.Cartesian3(0.25, 0.25, 0.25),
-       material : Cesium.Color.GREEN.withAlpha(0.5),
+       material : Cesium.Color.BLUE.withAlpha(0.5),
        outline : true,
+       outlineWidth : 8,
        outlineColor : Cesium.Color.BLACK
      }
    });
-*/
 
 /*
    var range3 = viewer.entities.add({
@@ -99,8 +101,9 @@
      position: Cesium.Cartesian3.fromDegrees(-82.4374472, 27.95621700, 1.1),
      box : {
        dimensions : new Cesium.Cartesian3(0.25, 0.25, 0.25),
-       material : Cesium.Color.GREEN.withAlpha(0.5),
+       material : Cesium.Color.BLUE.withAlpha(0.5),
        outline : true,
+       outlineWidth : 8,
        outlineColor : Cesium.Color.BLACK
      }
    });
@@ -111,8 +114,9 @@
      position: Cesium.Cartesian3.fromDegrees(-82.4374483, 27.9561880, 2.0),
      box : {
        dimensions : new Cesium.Cartesian3(0.25, 0.25, 0.25),
-       material : Cesium.Color.GREEN.withAlpha(0.5),
+       material : Cesium.Color.BLUE.withAlpha(0.5),
        outline : true,
+       outlineWidth : 8,
        outlineColor : Cesium.Color.BLACK
      }
    });
@@ -123,8 +127,9 @@
      position: Cesium.Cartesian3.fromDegrees(-82.4374464, 27.9561880, 0.3),
      box : {
         dimensions : new Cesium.Cartesian3(0.25, 0.25, 0.25),
-        material : Cesium.Color.GREEN.withAlpha(0.5),
+        material : Cesium.Color.BLUE.withAlpha(0.5),
         outline : true,
+        outlineWidth : 8,
         outlineColor : Cesium.Color.BLACK
      }
    });
@@ -134,8 +139,9 @@
      position: Cesium.Cartesian3.fromDegrees(-82.4374568, 27.9561641, 1.1),
      box : {
         dimensions : new Cesium.Cartesian3(0.25, 0.25, 0.25),
-        material : Cesium.Color.GREEN.withAlpha(0.5),
+        material : Cesium.Color.BLUE.withAlpha(0.5),
         outline : true,
+        outlineWidth : 8,
         outlineColor : Cesium.Color.BLACK
      }
    });
@@ -145,8 +151,9 @@
      position: Cesium.Cartesian3.fromDegrees(-82.4374483, 27.9561640, 0.7),
      box : {
        dimensions : new Cesium.Cartesian3(0.25, 0.25, 0.25),
-       material : Cesium.Color.GREEN.withAlpha(0.5),
+       material : Cesium.Color.BLUE.withAlpha(0.5),
        outline : true,
+       outlineWidth : 8,
        outlineColor : Cesium.Color.BLACK
      }
    });
@@ -154,7 +161,13 @@
 
    var colorizeInterval
 
-   var period = 5000
+   /* Every 5s, ask the server for the color state for devices */
+   var colorizePeriod = 5000
+
+   /* Every 100ms, decreates the alpha value a little */
+   var animationPeriod = 200
+
+   var configs = {}
 
    function colorize() {
      $.get( "/state", function( data ) {
@@ -163,48 +176,41 @@
            config = data.state[name]
            colorname = config["color"]
            alpha = config["alpha"]
+           startalpha = config["alphaStart"]
+           endalpha = config["alphaEnd"]
+           config["alphaDelta"] = (startalpha - endalpha) / ( colorizePeriod / animationPeriod )
 	   device = devices[name]
-           if(device) {
-             device.box.material = Cesium.Color[colorname].withAlpha(alpha)
-           } else {
-             console.log(`Cannot find device state for ${name}`)
-           }
+	   if(device) {
+	     configs[name] = config
+             if(device) {
+               device.box.material = Cesium.Color[colorname].withAlpha(alpha)
+             } else {
+               console.log(`Cannot find device state for ${name}`)
+             }
+	   }
 	 })
        }
      })
-
-/*
-     $.get( "/recent/motion/action/now-1m/now", function( data ) {
-       if(data && data.hits > 0) {
-         doorcamera.box.material = Cesium.Color.RED
-       } else {
-         $.get( "/recent/motion/action/now-5m/now", function( data ) {
-           if(data && data.hits > 0) {
-             doorcamera.box.material = Cesium.Color.ORANGE
-           } else {
-             doorcamera.box.material = Cesium.Color.GREEN
-           }
-         })
-       }
-     })
-     $.get( "/recent/minicam-motion/webhook/now-1m/now", function( data ) {
-       if(data && data.hits > 0) {
-         minicam.box.material = Cesium.Color.RED
-       } else {
-         $.get( "/recent/minicam-motion/webhook/now-5m/now", function( data ) {
-           if(data && data.hits > 0) {
-             minicam.box.material = Cesium.Color.ORANGE
-           } else {
-             minicam.box.material = Cesium.Color.GREEN
-           }
-         })
-       }
-     })
-*/
-
    }
 
-   colorizeInterval = setInterval(colorize, period)
+   function animate() {
+     $.each(configs, function( name, config ) {
+       device = devices[name]
+       oldalpha = config["alpha"]
+       alphaDelta = config["alphaDelta"]
+       newalpha = oldalpha - alphaDelta
+       if(newalpha >= config["alphaEnd"]) {
+         config["alpha"] = newalpha
+         colorname = config["color"]
+         console.log(`newalpha ${newalpha} alphaDelta ${alphaDelta}`)
+         device.box.material = Cesium.Color[colorname].withAlpha(newalpha)
+       }
+     })
+   }
+
+   colorizeInterval = setInterval(colorize, colorizePeriod)
+
+/*   animationInterval = setInterval(animate, animationPeriod) */
 
   </script>
 </body>
