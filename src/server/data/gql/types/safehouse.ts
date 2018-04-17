@@ -1,10 +1,11 @@
 import gql from 'graphql-tag';
 
-export const buildingType = gql`
-  type Building {
+export const safehouseType = gql`
+  type Safehouse {
     id: String
     name: String
-    color: String
+    status: String
     position: Position
+    sensors: [Sensor]
   }
 `;

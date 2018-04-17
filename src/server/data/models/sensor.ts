@@ -1,15 +1,20 @@
 import { Position } from './position';
 
-export interface Sensor {
-  id: string;
-  name: string;
-  color: string;
-  position: Position;
+export enum SensorType {
+  Camera = 'CAMERA',
+  AccessPoint = 'ACCESS_POINT'
 }
 
-export const createSensor = (id: string, name: string, color: string, position: Position): Sensor => ({
-  id,
-  name,
-  color,
-  position
-});
+export enum SensorStatus {
+  Normal = 'NORMAL',
+  Warning = 'WARNING',
+  Critical = 'CRITICAL'
+}
+
+export interface Sensor {
+  id: string;
+  type: SensorType;
+  status: SensorStatus;
+  position: Position;
+  related: Sensor[];
+}

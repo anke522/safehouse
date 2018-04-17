@@ -1,3 +1,3 @@
-export * from './building';
+export * from './safehosue';
 export * from './sensor';
 export * from './position';

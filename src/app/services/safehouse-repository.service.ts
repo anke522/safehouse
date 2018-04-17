@@ -1,3 +1,6 @@
+import 'rxjs/add/observable/from';
+import 'rxjs/add/operator/merge';
+
 import { Injectable } from '@angular/core';
 import { ApolloClient, ObservableQuery } from 'apollo-client';
 import { InMemoryCache } from 'apollo-cache-inmemory';

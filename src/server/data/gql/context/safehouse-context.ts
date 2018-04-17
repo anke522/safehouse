@@ -1,11 +1,10 @@
-import { BuildingsRepository, SensorsRepository } from '../../repositories';
+import { Safehouse } from '../../models';
+import { SafehouseStore } from '../../store';
 
 export interface SafehouseContext {
-  sensorsRepository: SensorsRepository;
-  buildingsRepository: BuildingsRepository;
+  safehouseStore: SafehouseStore;
 }
 
-export const createSafehouseContext = (): SafehouseContext => ({
-  sensorsRepository: new SensorsRepository(),
-  buildingsRepository: new BuildingsRepository()
+export const createSafehouseContext = (building: Safehouse): SafehouseContext => ({
+  safehouseStore: new SafehouseStore(building)
 });
