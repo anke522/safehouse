@@ -7,8 +7,9 @@ import { makeExecutableSchema } from 'graphql-tools';
 import * as types from './data/gql/types';
 import * as allResolvers from './data/gql/resolvers';
 import { createSafehouseContext } from './data/gql/context';
-import { SafehouseStatus } from './data/models';
-import { ElasticWatcher } from './db/elastic-watcher';
+import { ElasticWatcher } from './db';
+import { SensorsListener } from './data/sensors';
+import { safehosue } from './data/mocks';
 
 const typeDefs = Array.from(Object.values(types));
 const resolvers = Array.from(Object.values(allResolvers));
@@ -18,22 +19,14 @@ const schema = makeExecutableSchema({
   resolvers,
 });
 
-const context = createSafehouseContext({
-  id: '1',
-  name: 'safehouse',
-  status: SafehouseStatus.Normal,
-  position: {
-    lon: -82.4374762,
-    lat: 27.9561611,
-    alt: 0.0
-  },
-  sensors: []
-});
+const context = createSafehouseContext(safehosue);
 
 const elasticWatcher = new ElasticWatcher({
   host: 'https://elasticsearch.blueteam.devwerx.org',
   httpAuth: 'elastic:taiko7Ei'
 });
+
+const sensorsListener = new SensorsListener(elasticWatcher);
 
 const app = express();
 

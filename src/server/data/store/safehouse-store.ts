@@ -26,6 +26,10 @@ export class SafehouseStore {
     }
   }
 
+  getSensorById(id: string): Sensor {
+    return this._sensors.find(sensor => sensor.id === id);
+  }
+
   addOrUpdateSensor(sensor: Sensor) {
     const result = this._sensors.find(x => x.id === sensor.id);
 

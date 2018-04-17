@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 
 export const sensorType = gql`
   type Sensor {
-    id: Int
+    id: String
     type: String
     status: String
     position: Position
