@@ -41,7 +41,7 @@ var state = {
        "doorLock" : { "color" : "BLACK", "alpha" : 1.0, "alphaStart" : 1.0, "alphaEnd" : 0.5 },
  'motionDetector' : { "color" : "BLACK", "alpha" : 1.0, "alphaStart" : 1.0, "alphaEnd" : 0.5 },
           'lamp1' : { "color" : "BLACK", "alpha" : 1.0, "alphaStart" : 1.0, "alphaEnd" : 0.5 },
-      'safehouse' : { "color" : "WHITE", "alpha" : 1.0, "alphaStart" : 1.0, "alphaEnd" : 0.5 }
+      'safehouse' : { "color" : "WHITE", "alpha" : 0.5, "alphaStart" : 0.5, "alphaEnd" : 0.25 }
 }
 
 /* Need to eventually instrument these as well:
@@ -206,10 +206,7 @@ function updateState() {
     type: '_doc',
     body: {
       query: {
-        bool: {
-          must: { match: { Status: '1' } },
-	  filter: [ { range: { DateTime: { gte: 'now-5m', lt: 'now' } } } ]
-        }
+        range: { DateTime: { gte: now_in_milliseconds - 15000, lt: now_in_milliseconds } }
       }
     }
   }).then(function (resp) {
