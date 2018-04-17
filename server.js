@@ -116,6 +116,28 @@ function updateState() {
     }
   })
 
+  // If doorLock is NOT manually unlocked (door-lock-*), turn it WHITE, otherwise make it BLACK
+  es.search({
+    index: 'door-lock-*',
+    type: 'webhook',
+    body: {
+      sort: { timestamp: { order: "desc" }},
+      query: {
+        bool: {
+          must_not: { match: { user: "Manual Unlock" } },
+	  filter: [ { range: { timestamp: { gte: 'now-15s', lt: 'now' } } } ]
+        }
+      }
+    }
+  }).then(function (resp) {
+    var hits = (resp.hits && resp.hits.hits.length) || 0;
+    state["doorLock"]["color"] = ( hits > 0 ? "WHITE" : "BLACK" )
+  }, function (err) {
+    if(err) {
+      console.trace(err.message);
+    }
+  })
+
   // If motionDetector has triggered (domoticz), turn it YELLOW, otherwise make it BLACK
   es.search({
     index: 'domoticz',
@@ -130,7 +152,7 @@ function updateState() {
     }
   }).then(function (resp) {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
-    state["motionDetector"]["color"] = ( hits > 0 ? "YELLOW" : "BLACK" )
+    state["motionDetector"]["color"] = ( hits > 0 ? "WHITE" : "BLACK" )
   }, function (err) {
     if(err) {
       console.trace(err.message);
@@ -158,7 +180,6 @@ function updateState() {
       console.trace(err.message);
     }
   })
-
 
 }
 updateStateInterval = setInterval(updateState, 5000);
