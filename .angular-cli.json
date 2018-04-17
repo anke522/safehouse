@@ -9,6 +9,7 @@
       "outDir": "dist",
       "assets": [
         "assets",
+        "assets/models",
         "favicon.ico",
         { "glob": "**/*", "input": "../node_modules/cesium/Build/Cesium", "output": "./" }
       ],

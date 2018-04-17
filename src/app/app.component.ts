@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { MapLayerProviderOptions } from 'angular-cesium'
+import { MapLayerProviderOptions } from 'angular-cesium';
 
 @Component({
   selector: 'app-root',
@@ -9,4 +9,4 @@ import { MapLayerProviderOptions } from 'angular-cesium'
 export class AppComponent {
   title = 'app';
   MapLayerProviderOptions = MapLayerProviderOptions;
-}
+ }

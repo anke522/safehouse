@@ -1,0 +1,9 @@
+<ac-layer acFor="let building of buildings$" [context]="this">
+  <ac-model-desc props="{
+														position: building.position,
+														minimumPixelSize: 100,
+														maximumScale : 20000,
+														uri: '/assets/models/Global_SOFWERX.glb'
+												 }">
+  </ac-model-desc>
+</ac-layer>
