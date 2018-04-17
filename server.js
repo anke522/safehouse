@@ -76,6 +76,26 @@ function updateState() {
     }
   })
 
+  var now_in_milliseconds = (new Date).getTime();
+
+  // If person is detected by the doorCamera (persondetect), turn it WHITE, otherwise make it BLACK
+  es.search({
+    index: 'persondetect',
+    type: '_doc',
+    body: {
+      query: {
+        range: { timestamp: { gte: now_in_milliseconds - 15000, lt: now_in_milliseconds } }
+      }
+    }
+  }).then(function (resp) {
+    var hits = (resp.hits && resp.hits.hits.length) || 0;
+    state["doorCamera"]["color"] = ( hits > 0 ? "WHITE" : "BLACK" )
+  }, function (err) {
+    if(err) {
+      console.trace(err.message);
+    }
+  })
+
   // If unauthorized connection to the doorCamera occurs (webcam-pcap-*), turn it YELLOW, otherwise make it BLACK
   es.search({
     index: 'webcam-pcap-*',
@@ -174,7 +194,7 @@ function updateState() {
   }).then(function (resp) {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
     console.log(JSON.stringify(resp.hits.hits,null,2))
-    state["safehouse"]["color"] = ( hits > 0 ? "RED" : "BLACK" )
+    state["safehouse"]["color"] = ( hits > 0 ? "RED" : "WHITE" )
   }, function (err) {
     if(err) {
       console.trace(err.message);

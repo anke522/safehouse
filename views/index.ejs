@@ -31,11 +31,11 @@
 
     var scene = viewer.scene;
 
-    var devices = {}
+    var devices = {};
 
-    var center = Cesium.Cartesian3.fromDegrees(-82.4374762, 27.9561611, 0.0)
-    var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(center)
-    var devices["safehouse"] = scene.primitives.add(Cesium.Model.fromGltf({
+    var center = Cesium.Cartesian3.fromDegrees(-82.4374762, 27.9561611, 0.0);
+    var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(center);
+    devices["safehouse"] = scene.primitives.add(Cesium.Model.fromGltf({
         url : '/models/Global_SOFWERX.glb',
         modelMatrix : modelMatrix,
         scale : 1.0
@@ -183,7 +183,15 @@
 	   if(device) {
 	     configs[name] = config
              if(device) {
-               device.box.material = Cesium.Color[colorname].withAlpha(alpha)
+               if(device.box) {
+                 device.box.material = Cesium.Color[colorname].withAlpha(alpha)
+               } else {
+                 if(device.color) {
+                   device.color = Cesium.Color[colorname].withAlpha(alpha)
+		 } else {
+                   console.log(`Cannot find device.box or device.color for ${name}`)
+		 }
+               }
              } else {
                console.log(`Cannot find device state for ${name}`)
              }
