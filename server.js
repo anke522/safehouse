@@ -40,12 +40,12 @@ var state = {
     "accessPoint" : { "color" : "BLACK", "alpha" : 1.0, "alphaStart" : 1.0, "alphaEnd" : 0.5 },
        "doorLock" : { "color" : "BLACK", "alpha" : 1.0, "alphaStart" : 1.0, "alphaEnd" : 0.5 },
  'motionDetector' : { "color" : "BLACK", "alpha" : 1.0, "alphaStart" : 1.0, "alphaEnd" : 0.5 },
+          'lamp1' : { "color" : "BLACK", "alpha" : 1.0, "alphaStart" : 1.0, "alphaEnd" : 0.5 },
       'safehouse' : { "color" : "WHITE", "alpha" : 1.0, "alphaStart" : 1.0, "alphaEnd" : 0.5 }
 }
 
 /* Need to eventually instrument these as well:
      'miniCamera' : { "color" : "BLACK", "alpha" : 1.0 },
-          'lamp1' : { "color" : "BLACK", "alpha" : 1.0 },
      'blueRange1' : { "color" : "BLACK", "alpha" : 1.0 },
           'alexa' : { "color" : "BLACK", "alpha" : 1.0 }
 */
@@ -173,6 +173,27 @@ function updateState() {
   }).then(function (resp) {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
     state["motionDetector"]["color"] = ( hits > 0 ? "WHITE" : "BLACK" )
+  }, function (err) {
+    if(err) {
+      console.trace(err.message);
+    }
+  })
+
+  // If Alexa has triggered the lamp (alexa-trigger-*), turn it WHITE, otherwise make it BLACK
+  es.search({
+    index: 'alexa-trigger-*',
+    type: 'webhook',
+    body: {
+      query: {
+        bool: {
+          must: { match: { target: "lamp" } },
+	  filter: [ { range: { timestamp: { gte: 'now-15s', lt: 'now' } } } ]
+        }
+      }
+    }
+  }).then(function (resp) {
+    var hits = (resp.hits && resp.hits.hits.length) || 0;
+    state["lamp1"]["color"] = ( hits > 0 ? "WHITE" : "BLACK" )
   }, function (err) {
     if(err) {
       console.trace(err.message);
