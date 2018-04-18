@@ -114,6 +114,8 @@ function updateState() {
     }
   })
 
+  var doormanualunlock = 0;
+
   // If doorLock is manually unlocked (door-lock-*), turn it YELLOW, otherwise make it BLACK
   es.search({
     index: 'door-lock-*',
@@ -129,12 +131,37 @@ function updateState() {
     }
   }).then(function (resp) {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
-    state["doorLock"]["color"] = ( hits > 0 ? "YELLOW" : "BLACK" )
+    doormanualunlock = hits
   }, function (err) {
     if(err) {
       console.trace(err.message);
     }
   })
+
+  es.search({
+    index: 'ifttt-*',
+    type: 'webhook',
+    body: {
+      sort: { timestamp: { order: "desc" }},
+      query: {
+        bool: {
+          must: { match: { user: "Manual Unlock" } },
+	  filter: [ { range: { timestamp: { gte: 'now-15s', lt: 'now' } } } ]
+        }
+      }
+    }
+  }).then(function (resp) {
+    var hits = (resp.hits && resp.hits.hits.length) || 0;
+    doormanualunlock = doormanualunlock + hits
+  }, function (err) {
+    if(err) {
+      console.trace(err.message);
+    }
+  })
+
+  state["doorLock"]["color"] = ( doormanualunlock > 0 ? "YELLOW" : "BLACK" )
+
+  var doornotmanualunlock = 0;
 
   // If doorLock is NOT manually unlocked (door-lock-*), turn it WHITE, otherwise make it BLACK
   es.search({
@@ -151,12 +178,35 @@ function updateState() {
     }
   }).then(function (resp) {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
-    state["doorLock"]["color"] = ( hits > 0 ? "WHITE" : "BLACK" )
+    doornotmanualunlock = hits
   }, function (err) {
     if(err) {
       console.trace(err.message);
     }
   })
+
+  es.search({
+    index: 'ifttt-*',
+    type: 'webhook',
+    body: {
+      sort: { timestamp: { order: "desc" }},
+      query: {
+        bool: {
+          must_not: { match: { user: "Manual Unlock" } },
+	  filter: [ { range: { timestamp: { gte: 'now-15s', lt: 'now' } } } ]
+        }
+      }
+    }
+  }).then(function (resp) {
+    var hits = (resp.hits && resp.hits.hits.length) || 0;
+    doornotmanualunlock = doornotmanualunlock + hits
+  }, function (err) {
+    if(err) {
+      console.trace(err.message);
+    }
+  })
+
+  state["doorLock"]["color"] = ( doornotmanualunlock > 0 ? "WHITE" : "BLACK" )
 
   // If motionDetector has triggered (domoticz), turn it YELLOW, otherwise make it BLACK
   es.search({
