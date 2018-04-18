@@ -28,6 +28,9 @@ const elasticWatcher = new ElasticWatcher({
 
 const sensorsListener = new SensorsListener(elasticWatcher);
 
+sensorsListener.listenToAccessPoint(1000).subscribe(accessPoint => context.safehouseStore.addOrUpdateSensor(accessPoint));
+sensorsListener.listenToDoorCamera(1000).subscribe(doorCamera => context.safehouseStore.addOrUpdateSensor(doorCamera));
+
 const app = express();
 
 app.use(cors());

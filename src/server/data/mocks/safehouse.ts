@@ -1,4 +1,5 @@
-import { getAccessPoint, getDoorCamera } from './';
+import { getAccessPoint } from './access-point';
+import { getDoorCamera } from './door-camera';
 import { BuildingStatus, Sensor, Position } from '../models';
 
 const safehosue = {

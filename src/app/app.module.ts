@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AngularCesiumModule } from 'angular-cesium';
-import { SafehouseRepository } from './services/safehouse-repository.service';
+import { SafehouseStore } from './services/safehouse-store.service';
 
 
 import { AppComponent } from './app.component';
@@ -17,7 +17,7 @@ import { BuildingsLayer } from './components/buildings-layer/buildings-layer.com
     BrowserModule,
     AngularCesiumModule.forRoot()
   ],
-  providers: [SafehouseRepository],
+  providers: [SafehouseStore],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

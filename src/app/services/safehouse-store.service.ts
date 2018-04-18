@@ -1,4 +1,5 @@
 import 'rxjs/add/observable/from';
+import 'rxjs/add/observable/fromPromise';
 import 'rxjs/add/operator/merge';
 
 import { Injectable } from '@angular/core';
@@ -11,14 +12,12 @@ import gql from 'graphql-tag';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import { Building } from '../models/building';
+import { Sensor } from '../models/sensor';
 
 @Injectable()
-export class SafehouseRepository {
+export class SafehouseStore {
 
   private _client: ApolloClient<any>;
-  private _buildingsQuery: ObservableQuery<any>;
-  private _buildingsSubject: Subject<Building>;
-  private _buildingsStore: Map<string, Building>;
 
   constructor() {
     this._client = new ApolloClient({
@@ -40,17 +39,14 @@ export class SafehouseRepository {
     });
   }
 
-  getBuildings(): Observable<Building> {
-    if (!this._buildingsQuery) {
-      this._buildingsQuery = this._client.watchQuery({
-        fetchPolicy: "network-only",
-        pollInterval: 1000,
-        query: gql`
-          query buildings {
-            buildings {
+  getBuildingInfo(): Observable<Building> {
+    return Observable.fromPromise(this._client.query({
+      query: gql`
+          query safehouse {
+            safehouse {
               id
               name
-              color
+              status
               position {
                 lat
                 lon
@@ -59,21 +55,37 @@ export class SafehouseRepository {
             }
           }
         `
-      });
+    })).map(({data}) => Object.assign({}, data['safehouse'], {sensors: []}));
+  }
 
-      this._buildingsSubject = new Subject<Building>();
-      this._buildingsStore = new Map<string, Building>();
+  getSensors(): Observable<Array<Sensor>> {
+    return Observable.fromPromise(this._client.query({
+      query: gql`
+          query safehouse {
+            safehouse {
+              id
+              sensors {
+                id
+                type
+                status
+                message
+                position {
+                  lat
+                  lon
+                  alt
+                }
+                related {
+                  id
+                }
+              }
+            }
+          }
+        `
+    })).map(({data}) => Array.isArray(data['safehouse'].sensors) ? data['safehouse'].sensors : []);
 
-      this._buildingsSubject.subscribe(building => {
-        this._buildingsStore.set(building.id, building);
-      });
+  }
 
-      this._buildingsQuery.subscribe(({data}) => {
-        const buildings = Array.isArray(data.buildings) ? data.buildings : [];
-        buildings.forEach(building => this._buildingsSubject.next(building));
-      });
-    }
+  listenToSensors() {
 
-    return Observable.from(Array.from(this._buildingsStore.values())).merge(this._buildingsSubject);
   }
 }

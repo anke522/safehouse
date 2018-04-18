@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { AcNotification, ActionType } from 'angular-cesium';
-import { SafehouseRepository } from '../../services/safehouse-repository.service';
+import { SafehouseStore } from '../../services/safehouse-store.service';
 
 @Component({
   selector: 'buildings-layer',
@@ -12,8 +12,11 @@ export class BuildingsLayer {
 
   buildings$: Observable<AcNotification>;
 
-  constructor(safehouseRepository: SafehouseRepository) {
-    this.buildings$ = safehouseRepository.getBuildings().map(building => ({
+  constructor(safehouseStore: SafehouseStore) {
+    safehouseStore.getBuildingInfo().subscribe(x => console.log('xxxxxxxxxxxxxxxxx => ', x));
+    safehouseStore.getSensors().subscribe(x => console.log('xxxxxxxxxxxxxxxxx => ', x));
+
+    this.buildings$ = safehouseStore.getBuildingInfo().map(building => ({
       id: building.id,
       actionType: ActionType.ADD_UPDATE,
       entity: Object.assign({}, building, {
