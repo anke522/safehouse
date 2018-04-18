@@ -86,7 +86,7 @@ function updateState() {
     type: '_doc',
     body: {
       query: {
-        range: { DeviceTime: { gte: now_in_milliseconds - 15000, lt: now_in_milliseconds } }
+        range: { DeviceTime: { gte: now_in_milliseconds - 10000, lt: now_in_milliseconds } }
       }
     }
   };
@@ -285,7 +285,7 @@ function updateState() {
     type: '_doc',
     body: {
       query: {
-        range: { DateTime: { gte: now_in_milliseconds - 15000, lt: now_in_milliseconds } }
+        range: { DateTime: { gte: now_in_milliseconds - 10000, lt: now_in_milliseconds } }
       }
     }
   };
@@ -300,7 +300,7 @@ function updateState() {
   })
 
 }
-updateStateInterval = setInterval(updateState, 5000);
+updateStateInterval = setInterval(updateState, 1000);
 
 app.post('/', jsonParser, (req, res) => {
   console.log('POST /')
