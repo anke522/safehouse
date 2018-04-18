@@ -59,7 +59,7 @@ var updateStateInterval;
 function updateState() {
 
   // If unknown client attaches to the accessPoint, turn it YELLOW, otherwise make it BLACK
-  es.search({
+  var safehouse_query = {
     index: 'safehouse-ap-devices-*',
     type: 'webhook',
     body: {
@@ -67,8 +67,10 @@ function updateState() {
         range: { timestamp: { gte: 'now-15s', lt: 'now' } }
       }
     }
-  }).then(function (resp) {
+  }
+  es.search(safehouse_query).then(function (resp) {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
+    if(hits > 0) { console.log(`${hits} ` + JSON.stringify(safehouse_query)) }
     state["accessPoint"]["color"] = ( hits > 0 ? "YELLOW" : "BLACK" )
   }, function (err) {
     if(err) {
@@ -79,17 +81,20 @@ function updateState() {
   var now_in_milliseconds = (new Date).getTime();
 
   // If person is detected by the doorCamera (persondetect), turn it WHITE, otherwise make it BLACK
-  es.search({
+  var persondetect_query = {
     index: 'persondetect',
     type: '_doc',
     body: {
       query: {
-        range: { timestamp: { gte: now_in_milliseconds - 15000, lt: now_in_milliseconds } }
+        range: { DeviceTime: { gte: now_in_milliseconds - 15000, lt: now_in_milliseconds } }
       }
     }
-  }).then(function (resp) {
+  };
+  es.search(persondetect_query).then(function (resp) {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
+    if(hits > 0) { console.log(`${hits} ` + JSON.stringify(persondetect_query)) }
     state["doorCamera"]["color"] = ( hits > 0 ? "WHITE" : "BLACK" )
+    state["doorCamera"]["persondetect"] = hits
   }, function (err) {
     if(err) {
       console.trace(err.message);
@@ -97,7 +102,8 @@ function updateState() {
   })
 
   // If unauthorized connection to the doorCamera occurs (webcam-pcap-*), turn it YELLOW, otherwise make it BLACK
-  es.search({
+
+  var webcam_query = {
     index: 'webcam-pcap-*',
     type: 'webhook',
     body: {
@@ -105,19 +111,20 @@ function updateState() {
         range: { timestamp: { gte: 'now-15s', lt: 'now' } }
       }
     }
-  }).then(function (resp) {
+  }
+  es.search(webcam_query).then(function (resp) {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
-    state["doorCamera"]["color"] = ( hits > 0 ? "YELLOW" : "BLACK" )
+    if(hits > 0) { console.log(`${hits} ` + JSON.stringify(webcam_query)) }
+    state["doorCamera"]["color"] = ( hits > 0 ? "YELLOW" : state["doorCamera"]["color"] )
+    state["doorCamera"]["persondetect"] = hits
   }, function (err) {
     if(err) {
       console.trace(err.message);
     }
   })
-
-  var doormanualunlock = 0;
 
   // If doorLock is manually unlocked (door-lock-*), turn it YELLOW, otherwise make it BLACK
-  es.search({
+  var doorlock_query = {
     index: 'door-lock-*',
     type: 'webhook',
     body: {
@@ -129,16 +136,21 @@ function updateState() {
         }
       }
     }
-  }).then(function (resp) {
+  }
+  es.search(doorlock_query).then(function (resp) {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
-    doormanualunlock = hits
+    if(hits > 0) { console.log(`${hits} ` + JSON.stringify(doorlock_query)) }
+    state["doorLock"]["door-lock"] = hits
+    if(state["doorLock"]["ifttt"] && state["doorLock"]["ifttt"] <= 0) {
+     state["doorLock"]["color"] = ( hits > 0 ? "YELLOW" : "BLACK" )
+    }
   }, function (err) {
     if(err) {
       console.trace(err.message);
     }
   })
 
-  es.search({
+  var ifttt_query = {
     index: 'ifttt-*',
     type: 'webhook',
     body: {
@@ -150,21 +162,24 @@ function updateState() {
         }
       }
     }
-  }).then(function (resp) {
+  }
+  es.search(ifttt_query).then(function (resp) {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
-    doormanualunlock = doormanualunlock + hits
+    if(hits > 0) { console.log(`${hits} ` + JSON.stringify(ifttt_query)) }
+    state["doorLock"]["ifttt"] = hits
+    if(state["doorLock"]["door-lock"] && state["doorLock"]["door-lock"] <= 0) {
+      if(hits>0) { state["doorLock"]["color"] = "YELLOW" }
+    } else {
+      state["doorLock"]["color"] = ( hits > 0 ? "YELLOW" : "BLACK" )
+    }
   }, function (err) {
     if(err) {
       console.trace(err.message);
     }
   })
-
-  state["doorLock"]["color"] = ( doormanualunlock > 0 ? "YELLOW" : "BLACK" )
-
-  var doornotmanualunlock = 0;
 
   // If doorLock is NOT manually unlocked (door-lock-*), turn it WHITE, otherwise make it BLACK
-  es.search({
+  var doorlock_notquery = {
     index: 'door-lock-*',
     type: 'webhook',
     body: {
@@ -176,16 +191,21 @@ function updateState() {
         }
       }
     }
-  }).then(function (resp) {
+  }
+  es.search(doorlock_notquery).then(function (resp) {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
-    doornotmanualunlock = hits
+    if(hits > 0) { console.log(`${hits} ` + JSON.stringify(doorlock_notquery)) }
+    state["doorLock"]["notdoor-lock"] = hits
+    if(state["doorLock"]["notifttt"] && state["doorLock"]["notifttt"] <= 0) {
+      state["doorLock"]["color"] = ( hits > 0 ? "YELLOW" : "BLACK" )
+    }
   }, function (err) {
     if(err) {
       console.trace(err.message);
     }
   })
 
-  es.search({
+  var ifttt_notquery = {
     index: 'ifttt-*',
     type: 'webhook',
     body: {
@@ -197,19 +217,24 @@ function updateState() {
         }
       }
     }
-  }).then(function (resp) {
+  }
+  es.search(ifttt_notquery).then(function (resp) {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
-    doornotmanualunlock = doornotmanualunlock + hits
+    if(hits > 0) { console.log(`${hits} ` + JSON.stringify(ifttt_notquery)) }
+    state["doorLock"]["notifttt"] = hits
+    if(state["doorLock"]["door-lock"] && state["doorLock"]["notdoor-lock"] <= 0) {
+      if(hits>0) { state["doorLock"]["color"] = "YELLOW" }
+    } else {
+      state["doorLock"]["color"] = ( hits > 0 ? "YELLOW" : "BLACK" )
+    }
   }, function (err) {
     if(err) {
       console.trace(err.message);
     }
   })
 
-  state["doorLock"]["color"] = ( doornotmanualunlock > 0 ? "WHITE" : "BLACK" )
-
   // If motionDetector has triggered (domoticz), turn it YELLOW, otherwise make it BLACK
-  es.search({
+  var domoticz_query = {
     index: 'domoticz',
     type: 'notification',
     body: {
@@ -220,8 +245,10 @@ function updateState() {
         }
       }
     }
-  }).then(function (resp) {
+  };
+  es.search(domoticz_query).then(function (resp) {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
+    if(hits > 0) { console.log(`${hits} ` + JSON.stringify(domoticz_query)) }
     state["motionDetector"]["color"] = ( hits > 0 ? "WHITE" : "BLACK" )
   }, function (err) {
     if(err) {
@@ -230,7 +257,7 @@ function updateState() {
   })
 
   // If Alexa has triggered the lamp (alexa-trigger-*), turn it WHITE, otherwise make it BLACK
-  es.search({
+  var alexatrigger_query = {
     index: 'alexa-trigger-*',
     type: 'webhook',
     body: {
@@ -241,8 +268,10 @@ function updateState() {
         }
       }
     }
-  }).then(function (resp) {
+  };
+  es.search(alexatrigger_query).then(function (resp) {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
+    if(hits > 0) { console.log(`${hits} ` + JSON.stringify(alexatrigger_query)) }
     state["lamp1"]["color"] = ( hits > 0 ? "WHITE" : "BLACK" )
   }, function (err) {
     if(err) {
@@ -251,7 +280,7 @@ function updateState() {
   })
 
   // If David's safehouse algorithm has triggered (sfalgo), turn the safehouse RED, otherwise make it WHITE
-  es.search({
+  var sfalgo_query = {
     index: 'sfalgo',
     type: '_doc',
     body: {
@@ -259,9 +288,10 @@ function updateState() {
         range: { DateTime: { gte: now_in_milliseconds - 15000, lt: now_in_milliseconds } }
       }
     }
-  }).then(function (resp) {
+  };
+  es.search(sfalgo_query).then(function (resp) {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
-    console.log(JSON.stringify(resp.hits.hits,null,2))
+    if(hits > 0) { console.log(`${hits} ` + JSON.stringify(sfalgo_query)) }
     state["safehouse"]["color"] = ( hits > 0 ? "RED" : "WHITE" )
   }, function (err) {
     if(err) {
