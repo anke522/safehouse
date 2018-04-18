@@ -189,7 +189,7 @@ function updateState() {
       query: {
         bool: {
           must_not: { match: { user: "Manual Unlock" } },
-	  filter: [ { range: { timestamp: { gte: 'now-1d', lt: 'now' } } } ]
+	  filter: [ { range: { timestamp: { gte: 'now-10s', lt: 'now' } } } ]
         }
       }
     }
