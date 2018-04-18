@@ -93,8 +93,10 @@ function updateState() {
   es.search(persondetect_query).then(function (resp) {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
     if(hits > 0) { console.log(`${hits} ` + JSON.stringify(persondetect_query)) }
-    state["doorCamera"]["color"] = ( hits > 0 ? "WHITE" : "BLACK" )
     state["doorCamera"]["persondetect"] = hits
+    if(("webcam-pcap" in state["doorCamera"]) && state["doorCamera"]["webcam-pcap"] <= 0) {
+      state["doorCamera"]["color"] = ( hits > 0 ? "WHITE" : "BLACK" )
+    }
   }, function (err) {
     if(err) {
       console.trace(err.message);
@@ -115,8 +117,8 @@ function updateState() {
   es.search(webcam_query).then(function (resp) {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
     if(hits > 0) { console.log(`${hits} ` + JSON.stringify(webcam_query)) }
-    state["doorCamera"]["color"] = ( hits > 0 ? "YELLOW" : state["doorCamera"]["color"] )
-    state["doorCamera"]["persondetect"] = hits
+    state["doorCamera"]["color"] = ( hits > 0 ? "YELLOW" : "BLACK" )
+    state["doorCamera"]["webcam-pcap"] = hits
   }, function (err) {
     if(err) {
       console.trace(err.message);
@@ -141,10 +143,10 @@ function updateState() {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
     if(hits > 0) { console.log(`${hits} ` + JSON.stringify(doorlock_query)) }
     state["doorLock"]["door-lock"] = hits
-    if(state["doorLock"]["ifttt"] && state["doorLock"]["ifttt"] > 0) {
-      if(hits>0) { state["doorLock"]["color"] = "YELLOW" }
-    } else {
-      state["doorLock"]["color"] = ( hits > 0 ? "YELLOW" : "BLACK" )
+    if(hits>0) {
+      if(state["doorLock"]["color"] == "WHITE" || state["doorLock"]["color"] == "BLACK") {
+        state["doorLock"]["color"] = "YELLOW"
+      }
     }
   }, function (err) {
     if(err) {
@@ -169,9 +171,7 @@ function updateState() {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
     if(hits > 0) { console.log(`${hits} ` + JSON.stringify(ifttt_query)) }
     state["doorLock"]["ifttt"] = hits
-    if(state["doorLock"]["door-lock"] && state["doorLock"]["door-lock"] > 0) {
-      if(hits>0) { state["doorLock"]["color"] = "YELLOW" }
-    } else {
+    if(("door-lock" in state["doorLock"]) && state["doorLock"]["door-lock"] <= 0) {
       state["doorLock"]["color"] = ( hits > 0 ? "YELLOW" : "BLACK" )
     }
   }, function (err) {
@@ -189,7 +189,7 @@ function updateState() {
       query: {
         bool: {
           must_not: { match: { user: "Manual Unlock" } },
-	  filter: [ { range: { timestamp: { gte: 'now-10s', lt: 'now' } } } ]
+	  filter: [ { range: { timestamp: { gte: 'now-1d', lt: 'now' } } } ]
         }
       }
     }
@@ -198,12 +198,10 @@ function updateState() {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
     if(hits > 0) { console.log(`${hits} ` + JSON.stringify(doorlock_notquery)) }
     state["doorLock"]["notdoor-lock"] = hits
-    if((state["doorLock"]["ifttt"] && state["doorLock"]["ifttt"] <= 0) &&
-       (state["doorLock"]["door-lock"] && state["doorLock"]["door-lock"] <= 0)) {
-      if(state["doorLock"]["notifttt"] && state["doorLock"]["notifttt"] > 0) {
-        if(hits>0) { state["doorLock"]["color"] = "WHITE" }
-      } else {
-        state["doorLock"]["color"] = ( hits > 0 ? "WHITE" : "BLACK" )
+    if((("ifttt" in state["doorLock"]) && state["doorLock"]["ifttt"] <= 0) &&
+       (("door-lock" in state["doorLock"]) && state["doorLock"]["door-lock"] <= 0)) {
+      if(state["doorLock"]["color"] == "BLACK") {
+        state["doorLock"]["color"] = "WHITE"
       }
     }
   }, function (err) {
@@ -229,11 +227,9 @@ function updateState() {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
     if(hits > 0) { console.log(`${hits} ` + JSON.stringify(ifttt_notquery)) }
     state["doorLock"]["notifttt"] = hits
-    if((state["doorLock"]["ifttt"] && state["doorLock"]["ifttt"] <= 0) &&
-       (state["doorLock"]["door-lock"] && state["doorLock"]["door-lock"] <= 0)) {
-      if(state["doorLock"]["notdoor-lock"] && state["doorLock"]["notdoor-lock"] > 0) {
-        if(hits>0) { state["doorLock"]["color"] = "WHITE" }
-      } else {
+    if((("ifttt" in state["doorLock"]) && state["doorLock"]["ifttt"] <= 0) &&
+       (("door-lock" in state["doorLock"]) && state["doorLock"]["door-lock"] <= 0)) {
+      if(("notdoor-lock" in state["doorLock"]) && state["doorLock"]["notdoor-lock"] <= 0) {
         state["doorLock"]["color"] = ( hits > 0 ? "WHITE" : "BLACK" )
       }
     }
@@ -245,13 +241,13 @@ function updateState() {
 
   // If motionDetector has triggered (domoticz), turn it YELLOW, otherwise make it BLACK
   var domoticz_query = {
-    index: 'domoticz',
+    index: 'domoticz*',
     type: 'notification',
     body: {
       query: {
         bool: {
           must: { match: { message: "Motion" } },
-	  filter: [ { range: { date: { gte: 'now-10s', lt: 'now' } } } ]
+	  filter: [ { range: { timestamp: { gte: 'now-10s', lt: 'now' } } } ]
         }
       }
     }
