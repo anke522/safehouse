@@ -64,7 +64,7 @@ function updateState() {
     type: 'webhook',
     body: {
       query: {
-        range: { timestamp: { gte: 'now-15s', lt: 'now' } }
+        range: { timestamp: { gte: 'now-10s', lt: 'now' } }
       }
     }
   }
@@ -108,7 +108,7 @@ function updateState() {
     type: 'webhook',
     body: {
       query: {
-        range: { timestamp: { gte: 'now-15s', lt: 'now' } }
+        range: { timestamp: { gte: 'now-10s', lt: 'now' } }
       }
     }
   }
@@ -132,7 +132,7 @@ function updateState() {
       query: {
         bool: {
           must: { match: { user: "Manual Unlock" } },
-	  filter: [ { range: { timestamp: { gte: 'now-15s', lt: 'now' } } } ]
+	  filter: [ { range: { timestamp: { gte: 'now-10s', lt: 'now' } } } ]
         }
       }
     }
@@ -141,7 +141,7 @@ function updateState() {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
     if(hits > 0) { console.log(`${hits} ` + JSON.stringify(doorlock_query)) }
     state["doorLock"]["door-lock"] = hits
-    if(state["doorLock"]["ifttt"] && state["doorLock"]["ifttt"] <= 0) {
+    if(state["doorLock"]["ifttt"] && state["doorLock"]["ifttt"] > 0) {
       if(hits>0) { state["doorLock"]["color"] = "YELLOW" }
     } else {
       state["doorLock"]["color"] = ( hits > 0 ? "YELLOW" : "BLACK" )
@@ -160,7 +160,7 @@ function updateState() {
       query: {
         bool: {
           must: { match: { user: "Manual Unlock" } },
-	  filter: [ { range: { timestamp: { gte: 'now-15s', lt: 'now' } } } ]
+	  filter: [ { range: { timestamp: { gte: 'now-10s', lt: 'now' } } } ]
         }
       }
     }
@@ -169,7 +169,7 @@ function updateState() {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
     if(hits > 0) { console.log(`${hits} ` + JSON.stringify(ifttt_query)) }
     state["doorLock"]["ifttt"] = hits
-    if(state["doorLock"]["door-lock"] && state["doorLock"]["door-lock"] <= 0) {
+    if(state["doorLock"]["door-lock"] && state["doorLock"]["door-lock"] > 0) {
       if(hits>0) { state["doorLock"]["color"] = "YELLOW" }
     } else {
       state["doorLock"]["color"] = ( hits > 0 ? "YELLOW" : "BLACK" )
@@ -189,7 +189,7 @@ function updateState() {
       query: {
         bool: {
           must_not: { match: { user: "Manual Unlock" } },
-	  filter: [ { range: { timestamp: { gte: 'now-15s', lt: 'now' } } } ]
+	  filter: [ { range: { timestamp: { gte: 'now-10s', lt: 'now' } } } ]
         }
       }
     }
@@ -198,10 +198,13 @@ function updateState() {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
     if(hits > 0) { console.log(`${hits} ` + JSON.stringify(doorlock_notquery)) }
     state["doorLock"]["notdoor-lock"] = hits
-    if(state["doorLock"]["notifttt"] && state["doorLock"]["notifttt"] <= 0) {
-      if(hits>0) { state["doorLock"]["color"] = "WHITE" }
-    } else {
-      state["doorLock"]["color"] = ( hits > 0 ? "WHITE" : "BLACK" )
+    if((state["doorLock"]["ifttt"] && state["doorLock"]["ifttt"] <= 0) &&
+       (state["doorLock"]["door-lock"] && state["doorLock"]["door-lock"] <= 0)) {
+      if(state["doorLock"]["notifttt"] && state["doorLock"]["notifttt"] > 0) {
+        if(hits>0) { state["doorLock"]["color"] = "WHITE" }
+      } else {
+        state["doorLock"]["color"] = ( hits > 0 ? "WHITE" : "BLACK" )
+      }
     }
   }, function (err) {
     if(err) {
@@ -217,7 +220,7 @@ function updateState() {
       query: {
         bool: {
           must_not: { match: { user: "Manual Unlock" } },
-	  filter: [ { range: { timestamp: { gte: 'now-15s', lt: 'now' } } } ]
+	  filter: [ { range: { timestamp: { gte: 'now-10s', lt: 'now' } } } ]
         }
       }
     }
@@ -226,10 +229,13 @@ function updateState() {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
     if(hits > 0) { console.log(`${hits} ` + JSON.stringify(ifttt_notquery)) }
     state["doorLock"]["notifttt"] = hits
-    if(state["doorLock"]["notdoor-lock"] && state["doorLock"]["notdoor-lock"] <= 0) {
-      if(hits>0) { state["doorLock"]["color"] = "WHITE" }
-    } else {
-      state["doorLock"]["color"] = ( hits > 0 ? "WHITE" : "BLACK" )
+    if((state["doorLock"]["ifttt"] && state["doorLock"]["ifttt"] <= 0) &&
+       (state["doorLock"]["door-lock"] && state["doorLock"]["door-lock"] <= 0)) {
+      if(state["doorLock"]["notdoor-lock"] && state["doorLock"]["notdoor-lock"] > 0) {
+        if(hits>0) { state["doorLock"]["color"] = "WHITE" }
+      } else {
+        state["doorLock"]["color"] = ( hits > 0 ? "WHITE" : "BLACK" )
+      }
     }
   }, function (err) {
     if(err) {
@@ -244,8 +250,8 @@ function updateState() {
     body: {
       query: {
         bool: {
-          must: { match: { MESSAGE: "swx-u-range-sensor-motion-1" } },
-	  filter: [ { range: { date: { gte: 'now-15s', lt: 'now' } } } ]
+          must: { match: { message: "Motion" } },
+	  filter: [ { range: { date: { gte: 'now-10s', lt: 'now' } } } ]
         }
       }
     }
@@ -268,7 +274,7 @@ function updateState() {
       query: {
         bool: {
           must: { match: { target: "lamp" } },
-	  filter: [ { range: { timestamp: { gte: 'now-15s', lt: 'now' } } } ]
+	  filter: [ { range: { timestamp: { gte: 'now-10s', lt: 'now' } } } ]
         }
       }
     }
