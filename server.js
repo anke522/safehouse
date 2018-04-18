@@ -142,7 +142,9 @@ function updateState() {
     if(hits > 0) { console.log(`${hits} ` + JSON.stringify(doorlock_query)) }
     state["doorLock"]["door-lock"] = hits
     if(state["doorLock"]["ifttt"] && state["doorLock"]["ifttt"] <= 0) {
-     state["doorLock"]["color"] = ( hits > 0 ? "YELLOW" : "BLACK" )
+      if(hits>0) { state["doorLock"]["color"] = "YELLOW" }
+    } else {
+      state["doorLock"]["color"] = ( hits > 0 ? "YELLOW" : "BLACK" )
     }
   }, function (err) {
     if(err) {
@@ -197,7 +199,9 @@ function updateState() {
     if(hits > 0) { console.log(`${hits} ` + JSON.stringify(doorlock_notquery)) }
     state["doorLock"]["notdoor-lock"] = hits
     if(state["doorLock"]["notifttt"] && state["doorLock"]["notifttt"] <= 0) {
-      state["doorLock"]["color"] = ( hits > 0 ? "YELLOW" : "BLACK" )
+      if(hits>0) { state["doorLock"]["color"] = "WHITE" }
+    } else {
+      state["doorLock"]["color"] = ( hits > 0 ? "WHITE" : "BLACK" )
     }
   }, function (err) {
     if(err) {
@@ -222,10 +226,10 @@ function updateState() {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
     if(hits > 0) { console.log(`${hits} ` + JSON.stringify(ifttt_notquery)) }
     state["doorLock"]["notifttt"] = hits
-    if(state["doorLock"]["door-lock"] && state["doorLock"]["notdoor-lock"] <= 0) {
-      if(hits>0) { state["doorLock"]["color"] = "YELLOW" }
+    if(state["doorLock"]["notdoor-lock"] && state["doorLock"]["notdoor-lock"] <= 0) {
+      if(hits>0) { state["doorLock"]["color"] = "WHITE" }
     } else {
-      state["doorLock"]["color"] = ( hits > 0 ? "YELLOW" : "BLACK" )
+      state["doorLock"]["color"] = ( hits > 0 ? "WHITE" : "BLACK" )
     }
   }, function (err) {
     if(err) {
@@ -240,7 +244,7 @@ function updateState() {
     body: {
       query: {
         bool: {
-          must: { match: { MESSAGE: "swx-u-range-sensor-motion-1 Switch >> ON" } },
+          must: { match: { MESSAGE: "swx-u-range-sensor-motion-1" } },
 	  filter: [ { range: { date: { gte: 'now-15s', lt: 'now' } } } ]
         }
       }
