@@ -1,36 +1,34 @@
-import { SafehouseStatus, SensorStatus, SensorType } from "../models";
+import { getAccessPoint, getDoorCamera } from './';
+import { BuildingStatus, Sensor, Position } from '../models';
 
-export const safehosue = {
+const safehosue = {
   id: 'safe-house',
-  name: 'safehouse',
-  status: SafehouseStatus.Normal,
+  name: 'Safehouse',
+  status: BuildingStatus.Normal,
   position: {
     lon: -82.4374762,
     lat: 27.9561611,
     alt: 0.0
   },
-  sensors: [
-    {
-      id: 'access-point',
-      type: SensorType.AccessPoint,
-      status: SensorStatus.Normal,
-      position: {
-        lat: 0,
-        lon: 0,
-        alt: 0
-      },
-      related: ['door-camera']
-    },
-    {
-      id: 'door-camera',
-      type: SensorType.Camera,
-      status: SensorStatus.Normal,
-      position: {
-        lat: 0,
-        lon: 0,
-        alt: 0
-      },
-      related: ['access-point']
-    }
-  ]
+  sensors: [getAccessPoint(), getDoorCamera()]
 };
+
+export interface SafehouseOptions {
+  id?: string;
+  name?: string;
+  status?: BuildingStatus;
+  position?: Position;
+  sensors?: Sensor[];
+}
+
+export const getSafeHouse = ({id, name, status, position, sensors}: SafehouseOptions = {}) => ({
+  id: id || safehosue.id,
+  name: name || safehosue.name,
+  status: status || safehosue.status,
+  sensors: sensors || safehosue.sensors.slice(0),
+  position: position || {
+    lat: safehosue.position.lat,
+    lon: safehosue.position.lon,
+    alt: safehosue.position.alt
+  }
+});

@@ -9,7 +9,7 @@ import * as allResolvers from './data/gql/resolvers';
 import { createSafehouseContext } from './data/gql/context';
 import { ElasticWatcher } from './db';
 import { SensorsListener } from './data/sensors';
-import { safehosue } from './data/mocks';
+import { getSafeHouse } from './data/mocks';
 
 const typeDefs = Array.from(Object.values(types));
 const resolvers = Array.from(Object.values(allResolvers));
@@ -19,7 +19,7 @@ const schema = makeExecutableSchema({
   resolvers,
 });
 
-const context = createSafehouseContext(safehosue);
+const context = createSafehouseContext(getSafeHouse());
 
 const elasticWatcher = new ElasticWatcher({
   host: 'https://elasticsearch.blueteam.devwerx.org',

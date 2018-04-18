@@ -1,16 +1,16 @@
 import { Sensor } from './sensor';
 import { Position } from './position';
 
-export enum SafehouseStatus {
+export enum BuildingStatus {
   Normal = 'NORMAL',
   Warning = 'WARNING',
   Critical = 'CRITICAL'
 }
 
-export interface Safehouse {
+export interface Building {
   id: string;
   name: string;
-  status: SafehouseStatus;
+  status: BuildingStatus;
   position: Position;
   sensors: Sensor[];
 }

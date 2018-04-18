@@ -16,5 +16,6 @@ export interface Sensor {
   type: SensorType;
   status: SensorStatus;
   position: Position;
+  message: string;
   related: string[];
 }

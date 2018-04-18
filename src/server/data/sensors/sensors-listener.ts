@@ -1,7 +1,8 @@
 import 'rxjs/add/operator/map';
 import { Observable } from 'rxjs/Observable';
+import { getDoorCamera } from '../mocks';
 import { ElasticWatcher } from '../../db/';
-import { Sensor, SensorStatus, SensorType } from '../models';
+import { Sensor, SensorStatus } from '../models';
 
 export class SensorsListener {
 
@@ -23,17 +24,9 @@ export class SensorsListener {
     }, pollInterval).map(resp => {
       const hits = (resp.hits && resp.hits.hits.length) || 0;
 
-      return {
-        id: 'door-camera',
-        type: SensorType.Camera,
-        status: hits > 0 ? SensorStatus.Warning : SensorStatus.Normal,
-        position: {
-          lat: 0,
-          lon: 0,
-          alt: 0
-        },
-        related: []
-      }
+      return getDoorCamera({
+        status: SensorStatus.Warning
+      });
     });
   }
 

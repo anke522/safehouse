@@ -1,14 +1,14 @@
-import { Safehouse, SafehouseStatus, Sensor, Position } from '../models';
+import { Building, BuildingStatus, Sensor, Position } from '../models';
 
 export class SafehouseStore {
 
   private _id: string;
   private _name: string;
-  private _status: SafehouseStatus;
+  private _status: BuildingStatus;
   private _position: Position;
   private _sensors: Sensor[];
 
-  constructor(building: Safehouse) {
+  constructor(building: Building) {
     this._id = building.id;
     this._name = building.name;
     this._status = building.status;
@@ -16,7 +16,7 @@ export class SafehouseStore {
     this._sensors = building.sensors || [];
   }
 
-  getState(): Safehouse {
+  getState(): Building {
     return {
       id: this._id,
       name: this._name,
