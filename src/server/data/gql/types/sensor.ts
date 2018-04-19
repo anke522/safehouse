@@ -5,7 +5,7 @@ export const sensorType = gql`
     id: String
     type: String
     name: String
-    status: Int
+    status: String
     position: Position
     message: String
     related: [Sensor]
