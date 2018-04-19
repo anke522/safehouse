@@ -14,9 +14,11 @@
 														outlineColor: Cesium.Color.BLACK
 												 }">
   </ac-box-desc>
-  <ac-polyline-desc props="{
-    width : 4,
-    positions: sensor.polylinePositions,
-    material: dashedColor
-  }"></ac-polyline-desc>
+  <ac-array-desc acFor="let connection of sensor.connections" [idGetter]="connectionIdGetter">
+    <ac-polyline-desc props="{
+      width : 4,
+      positions: connection.positions,
+      material: connection.material
+    }"></ac-polyline-desc>
+  </ac-array-desc>
 </ac-layer>

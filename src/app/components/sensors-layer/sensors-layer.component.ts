@@ -28,48 +28,45 @@ export class SensorsLayerComponent implements OnInit {
     });
   }
 
+  connectionIdGetter(entity: any): string {
+    return entity.id;
+  }
+
+  createConnection(sensor, relatedSensor, dashedColor) {
+    return {
+      id: `${sensor.id}:${relatedSensor.id}`,
+      positions: [Cesium.Cartesian3.fromDegrees(sensor.position.lon, sensor.position.lat, sensor.position.alt),
+        Cesium.Cartesian3.fromDegrees(relatedSensor.position.lon, relatedSensor.position.lat, relatedSensor.position.alt),
+      ],
+      material: this.createDashedColor(dashedColor),
+    }
+  }
+
   checkConnections(sensors: Sensor[]) {
-    const isBadStatus = (s) => s.status === SensorStatus.Critical || s.status === SensorStatus.Warning;
+    const isBadStatus = (s) => s.status === SensorStatus.Compromised || s.status === SensorStatus.Warning;
 
     sensors.forEach(sensor => {
       if (isBadStatus(sensor)) {
-        const relatedWithBadStatus = sensor.related.filter(relatedSensor => {
-          isBadStatus(relatedSensor)
-        });
-        if (relatedWithBadStatus && !relatedWithBadStatus.length) {
+        const relatedWithBadStatus = sensor.related.filter(relatedSensor => isBadStatus(relatedSensor));
+        if (relatedWithBadStatus && relatedWithBadStatus.length) {
           // Check if doesnt already exits
-          const relatedToPaint = relatedWithBadStatus.filter(relatedBadSensor => {
-            return this.sensorConnectionsMap.has(relatedBadSensor.id);
-          });
+          const relatedToPaint = relatedWithBadStatus.filter(relatedBadSensor => !this.sensorConnectionsMap.has(relatedBadSensor.id));
 
           if (relatedToPaint && relatedToPaint.length) {
-            const connectionsLines = relatedToPaint.map(relatedSensor => ({
-              id: `${sensor.id}:${relatedSensor.id}`,
-              actionType: ActionType.ADD_UPDATE,
-              entity: {
-                positions: [Cesium.Cartesian3.fromDegrees(sensor.position.lon, sensor.position.lat, sensor.position.alt),
-                  Cesium.Cartesian3.fromDegrees(relatedSensor.position.lon, relatedSensor.position.lat, relatedSensor.position.alt),
-                ],
-                material: this.createDashedColor(sensor.status === SensorStatus.Critical || relatedSensor.status === SensorStatus.Critical ?
-                  Cesium.Color.RED :
-                  Cesium.Color.YELLOW),
-              }
-            }));
+            const connectionsLines = relatedToPaint.map(relatedSensor => this.createConnection(
+              sensor,
+              relatedSensor,
+              sensor.status === SensorStatus.Compromised || relatedSensor.status === SensorStatus.Compromised ?
+                Cesium.Color.RED :
+                Cesium.Color.YELLOW));
             this.sensorConnectionsMap.set(sensor.id, connectionsLines);
           }
         } else {
-          const connectionsLines = sensor.related.map(relatedSensor => ({
-            id: `${sensor.id}:${relatedSensor.id}`,
-            actionType: ActionType.ADD_UPDATE,
-            entity: {
-              positions: [Cesium.Cartesian3.fromDegrees(sensor.position.lon, sensor.position.lat, sensor.position.alt),
-                Cesium.Cartesian3.fromDegrees(relatedSensor.position.lon, relatedSensor.position.lat, relatedSensor.position.alt),
-              ],
-              material: this.createDashedColor(Cesium.Color.CYAN)
-            }
-          }));
+          const connectionsLines = sensor.related.map(relatedSensor => this.createConnection(
+            sensor,
+            relatedSensor,
+            Cesium.Color.CYAN));
           this.sensorConnectionsMap.set(sensor.id, connectionsLines);
-          // TODO all grey
         }
       } else {
         this.sensorConnectionsMap.delete(sensor.id);
@@ -79,7 +76,6 @@ export class SensorsLayerComponent implements OnInit {
 
   constructor(safehouseStore: SafehouseStore) {
     this.sensors$ = safehouseStore.listenToSensors(1000)
-    // .do(sensor => console.log(sensor))
       .do(sensors => this.checkConnections(sensors))
       .flatMap(sensor => sensor)
       .map(sensor => ({
@@ -94,7 +90,6 @@ export class SensorsLayerComponent implements OnInit {
           connections: this.sensorConnectionsMap.get(sensor.id),
         })
       }))
-      .do(x => console.log(x.entity.color));
   }
 
   ngOnInit() {
