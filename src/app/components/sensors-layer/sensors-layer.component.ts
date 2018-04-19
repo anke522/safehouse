@@ -20,14 +20,20 @@ export class SensorsLayerComponent implements OnInit {
   sensors$: Observable<AcNotification>;
 
   constructor(safehouseStore: SafehouseStore) {
-    this.sensors$ = safehouseStore.listenToSensors().map(sensor => ({
-      id: sensor.id,
-      actionType: ActionType.ADD_UPDATE,
-      entity: Object.assign({}, sensor, {
-        position: Cesium.Cartesian3.fromDegrees(sensor.position.lon, sensor.position.lat, sensor.position.alt),
-        color: SENSOR_COLORS_BY_STATUS[sensor.status] || SENSOR_COLORS_BY_STATUS.NORMAL,
-      })
-    }));
+
+    this.sensors$ = safehouseStore.listenToSensors()
+      .do(x => console.log(x))
+      .map(sensor => ({
+        id: sensor.id,
+        actionType: ActionType.ADD_UPDATE,
+        entity: Object.assign({}, sensor, {
+          position: Cesium.Cartesian3.fromDegrees(sensor.position.lon, sensor.position.lat, sensor.position.alt),
+          color: SENSOR_COLORS_BY_STATUS[sensor.status] || SENSOR_COLORS_BY_STATUS.NORMAL,
+          type: sensor.type,
+          showMessage: sensor.message && sensor.message.length !== 0,
+          message: sensor.message,
+        })
+      }));
   }
 
   ngOnInit() {
