@@ -1,3 +1,4 @@
+import { merge } from 'rxjs/observable/merge';
 import 'rxjs/add/operator/map';
 import { Observable } from 'rxjs/Observable';
 import { getAccessPoint, getDoorCamera } from '../mocks';
@@ -33,7 +34,7 @@ export class SensorsListener {
   }
 
   listenToDoorCamera(pollInterval: number): Observable<Sensor> {
-    return this._esWatcher.watch({
+    const personDetection$ = this._esWatcher.watch({
       index: 'persondetect',
       type: '_doc',
       body: {
@@ -50,6 +51,26 @@ export class SensorsListener {
         message: hits > 0 ? 'Person is detected by the doorCamera' : ''
       });
     });
+
+    const unauthorizedConnection$ = this._esWatcher.watch({
+      index: 'webcam-pcap-*',
+      type: 'webhook',
+      body: {
+        query: {
+          range: { timestamp: { gte: 'now-10s', lt: 'now' } }
+        }
+      }
+    }, pollInterval).map(resp => {
+      const hits = (resp.hits && resp.hits.hits.length) || 0;
+
+      return getDoorCamera({
+        // If unauthorized connection to the doorCamera occurs (webcam-pcap-*), turn it YELLOW, otherwise make it BLACK
+        status: hits > 0 ? SensorStatus.Warning : SensorStatus.Normal,
+        message: hits > 0 ? 'Unauthorized connection to the door camera' : ''
+      });
+    });
+
+    return merge(personDetection$, unauthorizedConnection$);
   }
 }
 

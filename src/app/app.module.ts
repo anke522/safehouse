@@ -5,13 +5,13 @@ import { SafehouseStore } from './services/safehouse-store.service';
 
 
 import { AppComponent } from './app.component';
-import { BuildingsLayer } from './components/buildings-layer/buildings-layer.component';
+import { SafehouseLayer } from './components/safehouse-layer/safehouse-layer.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    BuildingsLayer
+    SafehouseLayer
   ],
   imports: [
     BrowserModule,

@@ -4,17 +4,18 @@ import { AcNotification, ActionType } from 'angular-cesium';
 import { SafehouseStore } from '../../services/safehouse-store.service';
 
 @Component({
-  selector: 'buildings-layer',
-  templateUrl: './buildings-layer.component.html',
-  styleUrls: ['./buildings-layer.component.css']
+  selector: 'safehouse-layer',
+  templateUrl: './safehouse-layer.component.html',
+  styleUrls: ['./safehouse-layer.component.css']
 })
-export class BuildingsLayer {
+export class SafehouseLayer {
 
   buildings$: Observable<AcNotification>;
 
   constructor(safehouseStore: SafehouseStore) {
     safehouseStore.getBuildingInfo().subscribe(x => console.log('xxxxxxxxxxxxxxxxx => ', x));
     safehouseStore.getSensors().subscribe(x => console.log('xxxxxxxxxxxxxxxxx => ', x));
+    safehouseStore.listenToSensors().subscribe(x => console.log('xxxxxxxxxxxxxxxxx => ', x));
 
     this.buildings$ = safehouseStore.getBuildingInfo().map(building => ({
       id: building.id,

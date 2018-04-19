@@ -1,6 +1,7 @@
 import 'rxjs/add/observable/from';
 import 'rxjs/add/observable/fromPromise';
 import 'rxjs/add/operator/merge';
+import 'rxjs/add/operator/switchMap';
 
 import { Injectable } from '@angular/core';
 import { ApolloClient, ObservableQuery } from 'apollo-client';
@@ -81,11 +82,40 @@ export class SafehouseStore {
             }
           }
         `
-    })).map(({data}) => Array.isArray(data['safehouse'].sensors) ? data['safehouse'].sensors : []);
-
+    })).switchMap(({data}) => Observable.from(Array.isArray(data['safehouse'].sensors) ? data['safehouse'].sensors : []));
   }
 
-  listenToSensors() {
+  listenToSensors(pollInterval?: number): Observable<Array<Sensor>> {
+    return Observable.create(observer => {
+      const subscription = this._client.watchQuery({
+        pollInterval: pollInterval || 1000,
+        fetchPolicy: "network-only",
+        query: gql`
+          query safehouse {
+            safehouse {
+              id
+              sensors {
+                id
+                type
+                status
+                message
+                position {
+                  lat
+                  lon
+                  alt
+                }
+                related {
+                  id
+                }
+              }
+            }
+          }
+        `
+      }).subscribe(({data}) => {
+        const sensors = Array.isArray(data['safehouse'].sensors) ? data['safehouse'].sensors : [];
 
+        sensors.forEach(sensor => observer.next(sensor));
+      });
+    });
   }
 }
