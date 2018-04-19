@@ -2,8 +2,8 @@ import { Sensor } from './sensor';
 import { Position } from './position';
 
 export enum BuildingStatus {
-  Normal = 'NORMAL',
-  Compromised = 'COMPROMISED'
+  Normal = 'Normal',
+  Compromised = 'Compromised'
 }
 
 export interface Building {

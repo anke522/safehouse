@@ -41,7 +41,7 @@ export class SensorsListener {
       type: '_doc',
       body: {
         query: {
-          range: {timestamp: {gte: Date.now() - 15000, lt: Date.now()}}
+          range: { timestamp: { gte: Date.now() - 10000, lt: Date.now() } }
         }
       }
     }, pollInterval).map(resp => {
@@ -80,8 +80,8 @@ export class SensorsListener {
       body: {
         query: {
           bool: {
-            must: { match: { message: "Motion" } },
-            filter: [ { range: { timestamp: { gte: 'now-10s', lt: 'now' } } } ]
+            must: { match: { message: 'Motion' } },
+            filter: [{ range: { timestamp: { gte: 'now-10s', lt: 'now' } } }]
           }
         }
       }
@@ -100,11 +100,11 @@ export class SensorsListener {
       index: 'door-lock-*',
       type: 'webhook',
       body: {
-        sort: { timestamp: { order: "desc" }},
+        sort: { timestamp: { order: 'desc' } },
         query: {
           bool: {
-            must: { match: { user: "Manual Unlock" } },
-            filter: [ { range: { timestamp: { gte: 'now-10s', lt: 'now' } } } ]
+            must: { match: { user: 'Manual Unlock' } },
+            filter: [{ range: { timestamp: { gte: 'now-10s', lt: 'now' } } }]
           }
         }
       }
@@ -121,11 +121,11 @@ export class SensorsListener {
       index: 'ifttt-*',
       type: 'webhook',
       body: {
-        sort: { timestamp: { order: "desc" }},
+        sort: { timestamp: { order: 'desc' } },
         query: {
           bool: {
-            must: { match: { user: "Manual Unlock" } },
-            filter: [ { range: { timestamp: { gte: 'now-10s', lt: 'now' } } } ]
+            must: { match: { user: 'Manual Unlock' } },
+            filter: [{ range: { timestamp: { gte: 'now-10s', lt: 'now' } } }]
           }
         }
       }
@@ -142,11 +142,11 @@ export class SensorsListener {
       index: 'door-lock-*',
       type: 'webhook',
       body: {
-        sort: { timestamp: { order: "desc" }},
+        sort: { timestamp: { order: 'desc' } },
         query: {
           bool: {
-            must_not: { match: { user: "Manual Unlock" } },
-            filter: [ { range: { timestamp: { gte: 'now-10s', lt: 'now' } } } ]
+            must_not: { match: { user: 'Manual Unlock' } },
+            filter: [{ range: { timestamp: { gte: 'now-10s', lt: 'now' } } }]
           }
         }
       }
@@ -163,11 +163,11 @@ export class SensorsListener {
       index: 'ifttt-*',
       type: 'webhook',
       body: {
-        sort: { timestamp: { order: "desc" }},
+        sort: { timestamp: { order: 'desc' } },
         query: {
           bool: {
-            must_not: { match: { user: "Manual Unlock" } },
-            filter: [ { range: { timestamp: { gte: 'now-10s', lt: 'now' } } } ]
+            must_not: { match: { user: 'Manual Unlock' } },
+            filter: [{ range: { timestamp: { gte: 'now-10s', lt: 'now' } } }]
           }
         }
       }
@@ -195,7 +195,7 @@ export class SensorsListener {
     }, pollInterval).map(resp => {
       const hits = (resp.hits && resp.hits.hits.length) || 0;
 
-      return hits > 0 ? BuildingStatus.Normal : BuildingStatus.Compromised;
+      return hits > 0 ? BuildingStatus.Compromised : BuildingStatus.Normal;
     });
   }
 }

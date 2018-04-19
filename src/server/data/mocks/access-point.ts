@@ -7,7 +7,7 @@ const accessPoint: Sensor = {
   status: SensorStatus.Normal,
   message: '',
   position: {
-    lon: -82.4374762 +  0.0000279,
+    lon: -82.4374762 + 0.000015 + 0.0000279,
     lat: 27.9561611 + 0.0000269,
     alt: 2.0
   },

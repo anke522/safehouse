@@ -30,6 +30,7 @@ export class SafehouseLayer {
         if (building.status === BuildingStatus.Compromised) {
           this.alertService.playAlert();
         }
+        console.log(building.status);
       })
       .map(building => ({
       id: building.id,
