@@ -1,4 +1,4 @@
-import { Building, BuildingStatus, Position, Sensor, SensorStatus } from '../models';
+import { Building, BuildingStatus, Position, Sensor, SensorStatus, SensorType } from '../models';
 
 export class SafehouseStore {
 
@@ -31,30 +31,31 @@ export class SafehouseStore {
   }
 
   addOrUpdateSensor(sensor: Sensor) {
-    const result = this._sensors.find(x => x.id === sensor.id);
-
+    const resultSensor = this._sensors.find(x => x.id === sensor.id) || sensor;
     const originalNewStatus = sensor.status;
     const originalNewMessage = sensor.message;
-    delete sensor.status;
-    delete sensor.message;
-    if (result) {
-      Object.assign(result, sensor);
+
+    if (resultSensor) {
+      delete sensor.status;
+      delete sensor.message;
+      Object.assign(resultSensor, sensor);
     }
     else {
       this._sensors.push(sensor);
     }
 
-    this.updateSensorStatus(sensor, originalNewStatus, originalNewMessage);
+    this.updateSensorStatus(resultSensor, originalNewStatus, originalNewMessage);
 
     this._sensors.forEach(s => {
-        if (this.isSensorsRelated(s, sensor)) {
-          if(s.status >= SensorStatus.Warning && sensor.status >= SensorStatus.Warning) {
+        if (this.isSensorsRelated(s, resultSensor)) {
+          if (s.status >= SensorStatus.Warning && resultSensor.status >= SensorStatus.Warning) {
             s.combinedStatus = SensorStatus.Compromised;
-            sensor.combinedStatus = SensorStatus.Compromised;
-          } else if (s.status >= SensorStatus.Warning || sensor.status >= SensorStatus.Warning){
-            s.combinedStatus = Math.max(s.status, sensor.status);
-            sensor.combinedStatus = Math.max(s.status, sensor.status);
+            resultSensor.combinedStatus = SensorStatus.Compromised;
           }
+          // else if (s.status >= SensorStatus.Warning || resultSensor.status >= SensorStatus.Warning) {
+          //   s.combinedStatus = Math.max(s.status, resultSensor.status);
+          //   resultSensor.combinedStatus = Math.max(s.status, resultSensor.status);
+          // }
         }
       }
     );
