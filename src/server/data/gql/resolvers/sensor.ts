@@ -1,9 +1,10 @@
 import { SafehouseContext } from '../context';
+import { SensorStatus } from '../../models';
 
 export const sensorResolver =  {
   Sensor: {
     related: (sensor, args, context: SafehouseContext) => sensor.related
       .map(sensorId => context.safehouseStore.getSensorById(sensorId)),
-    status: (sensor) => sensor.combinedStatus || sensor.status
-  }
+    status: (sensor) => SensorStatus[sensor.combinedStatus || sensor.status],
+  },
 };

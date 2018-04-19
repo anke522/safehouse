@@ -1,6 +1,8 @@
-import { getAccessPoint } from './access-point';
 import { getDoorCamera } from './door-camera';
 import { BuildingStatus, Sensor, Position } from '../models';
+import { getAccessPoint } from './access-point';
+import { getMotionDetector } from './motion-detector';
+import { getDoorLock } from './door-lock';
 
 const safehosue = {
   id: 'safe-house',
@@ -11,7 +13,7 @@ const safehosue = {
     lat: 27.9561611,
     alt: 0.0
   },
-  sensors: [getAccessPoint(), getDoorCamera()]
+  sensors: [getAccessPoint(), getDoorCamera(), getMotionDetector(), getDoorLock()]
 };
 
 export interface SafehouseOptions {

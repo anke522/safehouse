@@ -183,7 +183,7 @@ export class SensorsListener {
     return merge(manualUnlock1$, manualUnlock2$, nonManualUnlock1$, nonManualUnlock2$);
   }
 
-  listenToSafehouseState(pollInterval: number): Observable<BuildingStatus> {
+  listenToSafehouseStatus(pollInterval: number): Observable<BuildingStatus> {
     return this._esWatcher.watch({
       index: 'sfalgo',
       type: '_doc',
