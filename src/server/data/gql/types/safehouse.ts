@@ -4,7 +4,7 @@ export const buildingType = gql`
   type Building {
     id: String
     name: String
-    status: String
+    status: Int
     position: Position
     sensors: [Sensor]
   }
