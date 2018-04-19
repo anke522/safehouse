@@ -14,9 +14,7 @@ export class AppComponent {
 
   constructor(viewerConfig: ViewerConfiguration) {
     viewerConfig.viewerOptions = {
-      selectionIndicator : false,
       timeline : false,
-      infoBox : false,
       baseLayerPicker : false,
       animation : false,
       homeButton : false,
@@ -26,7 +24,6 @@ export class AppComponent {
     };
 
     viewerConfig.viewerModifier = (viewer: any) => {
-      viewer.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
       viewer.bottomContainer.remove();
     };
   }
