@@ -28,7 +28,7 @@ export class SensorsLayerComponent implements OnInit {
         entity: Object.assign({}, sensor, {
           position: Cesium.Cartesian3.fromDegrees(sensor.position.lon, sensor.position.lat, sensor.position.alt),
           color: SENSOR_COLORS_BY_STATUS[sensor.status] || SENSOR_COLORS_BY_STATUS.NORMAL,
-          name: `${sensor.type}, status: ${sensor.status}`,
+          name: `${sensor.name}, status: ${sensor.status}`,
           showMessage: sensor.message && sensor.message.length !== 0,
           message: sensor.message,
         })

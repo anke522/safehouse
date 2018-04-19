@@ -73,6 +73,7 @@ export class SafehouseStore {
               sensors {
                 id
                 type
+                name
                 status
                 message
                 position {
@@ -103,6 +104,7 @@ export class SafehouseStore {
               sensors {
                 id
                 type
+                name
                 status
                 message
                 position {
