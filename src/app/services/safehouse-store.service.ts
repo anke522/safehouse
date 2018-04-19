@@ -94,6 +94,7 @@ export class SafehouseStore {
           query safehouse {
             safehouse {
               id
+              status
               sensors {
                 id
                 type
