@@ -3,8 +3,7 @@ import { Position } from './position';
 
 export enum BuildingStatus {
   Normal = 'NORMAL',
-  Warning = 'WARNING',
-  Critical = 'CRITICAL'
+  Compromised = 'COMPROMISED'
 }
 
 export interface Building {

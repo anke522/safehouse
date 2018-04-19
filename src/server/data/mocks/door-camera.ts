@@ -1,14 +1,15 @@
-import { SensorStatus, SensorType, Position } from '../models';
+import { SensorStatus, SensorType, Position, Sensor } from '../models';
 
-const doorCamera = {
+const doorCamera: Sensor = {
   id: 'door-camera',
   type: SensorType.Camera,
+  name: 'Door Camera',
   status: SensorStatus.Normal,
   message: '',
   position: {
-    lat: 0,
-    lon: 0,
-    alt: 0
+    lat: -82.4374612,
+    lon: 27.9561761,
+    alt: 2.6,
   },
   related: ['access-point']
 };
@@ -16,15 +17,17 @@ const doorCamera = {
 export interface DoorCameraOptions {
   id?: string;
   type?: SensorType;
+  name?: string;
   status?: SensorStatus;
   position?: Position;
   message?: string;
   related?: string[];
 }
 
-export const getDoorCamera = ({id, type, status, message, position, related}: DoorCameraOptions = {}) => ({
+export const getDoorCamera = ({id, type, name, status, message, position, related}: DoorCameraOptions = {}): Sensor => ({
   id: id || doorCamera.id,
   type: type || doorCamera.type,
+  name: name || doorCamera.name,
   status: status || doorCamera.status,
   message: message || doorCamera.message,
   related: related || doorCamera.related.slice(0),
