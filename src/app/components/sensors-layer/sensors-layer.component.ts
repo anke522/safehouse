@@ -4,10 +4,10 @@ import { Observable } from "rxjs/Observable";
 import { SafehouseStore } from "../../services/safehouse-store.service";
 
 const SENSOR_COLORS_BY_STATUS = {
-  ENGAGED: Cesium.Color.GREEN.withAlpha(0.9),
-  WARNING: Cesium.Color.YELLOW.withAlpha(0.9),
-  COMPROMISED: Cesium.Color.RED.withAlpha(0.9),
-  NORMAL: Cesium.Color.WHITE,
+  Engaged: Cesium.Color.GREEN.withAlpha(0.9),
+  Warning: Cesium.Color.YELLOW.withAlpha(0.9),
+  Compromised: Cesium.Color.RED.withAlpha(0.9),
+  Normal: Cesium.Color.GRAY,
 };
 
 @Component({
@@ -27,7 +27,7 @@ export class SensorsLayerComponent implements OnInit {
         actionType: ActionType.ADD_UPDATE,
         entity: Object.assign({}, sensor, {
           position: Cesium.Cartesian3.fromDegrees(sensor.position.lon, sensor.position.lat, sensor.position.alt),
-          color: SENSOR_COLORS_BY_STATUS[sensor.status] || SENSOR_COLORS_BY_STATUS.NORMAL,
+          color: SENSOR_COLORS_BY_STATUS[sensor.status] || SENSOR_COLORS_BY_STATUS.Normal,
           name: `${sensor.name}, status: ${sensor.status}`,
           showMessage: sensor.message && sensor.message.length !== 0,
           message: sensor.message,

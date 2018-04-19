@@ -8,7 +8,7 @@ const doorCamera: Sensor = {
   status: SensorStatus.Normal,
   message: '',
   position: {
-    lon: -82.4374762,
+    lon: -82.4374762 + 0.000015,
     lat: 27.9561611 + 0.0000150,
     alt: 2.6,
   },
