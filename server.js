@@ -201,7 +201,7 @@ function updateState() {
     if((("ifttt" in state["doorLock"]) && state["doorLock"]["ifttt"] <= 0) &&
        (("door-lock" in state["doorLock"]) && state["doorLock"]["door-lock"] <= 0)) {
       if(state["doorLock"]["color"] == "BLACK") {
-        state["doorLock"]["color"] = "WHITE"
+        if(hits > 0) { state["doorLock"]["color"] = "WHITE" }
       }
     }
   }, function (err) {
