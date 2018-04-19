@@ -22,8 +22,8 @@ const schema = makeExecutableSchema({
 const context = createSafehouseContext(getSafeHouse());
 
 const elasticWatcher = new ElasticWatcher({
-  host: '',
-  httpAuth: ''
+  host: 'https://elasticsearch.blueteam.devwerx.org',
+  httpAuth: 'elastic:taiko7Ei'
 });
 
 const sensorsListener = new SensorsListener(elasticWatcher);
