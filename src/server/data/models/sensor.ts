@@ -12,7 +12,7 @@ export enum SensorStatus {
   Normal = 'NORMAL',
   Engaged = 'ENGAGED',
   Warning = 'WARNING',
-  Critical = 'CRITICAL'
+  Compromised = 'COMPROMISED'
 }
 
 export interface Sensor {
@@ -20,6 +20,7 @@ export interface Sensor {
   type: SensorType;
   name: string;
   status: SensorStatus;
+  combinedStatus: SensorStatus;
   position: Position;
   message: string;
   related: string[];
