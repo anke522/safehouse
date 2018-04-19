@@ -1,7 +1,7 @@
 <ac-layer acFor="let sensor of sensors$" [context]="this">
   <ac-html-desc props="{position: sensor.position, show: sensor.showMessage}">
     <ng-template let-html>
-      <h4 class="sensor-message" *ngIf="sensor.message">{{sensor.message}}</h4>
+      <h4 class="sensor-message">{{sensor.message}}</h4>
     </ng-template>
   </ac-html-desc>
   <ac-box-desc props="{
