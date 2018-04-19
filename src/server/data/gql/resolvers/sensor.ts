@@ -6,5 +6,9 @@ export const sensorResolver =  {
     related: (sensor, args, context: SafehouseContext) => sensor.related
       .map(sensorId => context.safehouseStore.getSensorById(sensorId)),
     status: (sensor) => SensorStatus[sensor.combinedStatus || sensor.status],
+    message: (sensor) => {
+      console.log(sensor.message);
+      return sensor.message;
+    }
   },
 };
