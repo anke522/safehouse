@@ -71,13 +71,10 @@ export class SafehouseStore {
     return sensor1.related.findIndex(s => s === sensor2.id) >= 0;
   }
 
-  private updateSensorStatus(sensor: Sensor, status: SensorStatus, message: string): SensorStatus | undefined {
-    if (sensor.status <= 1 || sensor.status < status) {
+  private updateSensorStatus(sensor: Sensor, status: SensorStatus, message: string) {
+    if (sensor.status <= 1 || sensor.status <= status) {
       sensor.status = status;
       sensor.message = message;
-      return status;
     }
-
-    return undefined;
   }
 }
