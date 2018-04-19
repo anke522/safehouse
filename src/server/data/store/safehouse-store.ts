@@ -35,7 +35,7 @@ export class SafehouseStore {
     const originalNewStatus = sensor.status;
     const originalNewMessage = sensor.message;
 
-    if (resultSensor) {
+    if (resultSensor !== sensor) {
       delete sensor.status;
       delete sensor.message;
       Object.assign(resultSensor, sensor);

@@ -29,8 +29,8 @@ export class SensorsListener {
       const hits = (resp.hits && resp.hits.hits.length) || 0;
 
       return getAccessPoint({
-        status: hits > 0 ? SensorStatus.Warning : SensorStatus.Normal,
-        message: hits > 0 ? 'Unknown client attached to access point' : ''
+        status: Math.random() > 0.5 ? SensorStatus.Warning : SensorStatus.Normal,
+        message: Math.random() > 0.5 ? 'Unknown client attached to access point' : ''
       });
     });
   }
