@@ -64,7 +64,7 @@ function updateState() {
     type: 'webhook',
     body: {
       query: {
-        range: { timestamp: { gte: 'now-10s', lt: 'now' } }
+        range: { timestamp: { gte: 'now-60s', lt: 'now' } }
       }
     }
   }
@@ -110,7 +110,7 @@ function updateState() {
     type: 'webhook',
     body: {
       query: {
-        range: { timestamp: { gte: 'now-10s', lt: 'now' } }
+        range: { timestamp: { gte: 'now-60s', lt: 'now' } }
       }
     }
   }
@@ -134,7 +134,7 @@ function updateState() {
       query: {
         bool: {
           must: { match: { user: "Manual Unlock" } },
-	  filter: [ { range: { timestamp: { gte: 'now-10s', lt: 'now' } } } ]
+	  filter: [ { range: { timestamp: { gte: 'now-60s', lt: 'now' } } } ]
         }
       }
     }
@@ -162,7 +162,7 @@ function updateState() {
       query: {
         bool: {
           must: { match: { user: "Manual Unlock" } },
-	  filter: [ { range: { timestamp: { gte: 'now-10s', lt: 'now' } } } ]
+	  filter: [ { range: { timestamp: { gte: 'now-60s', lt: 'now' } } } ]
         }
       }
     }
@@ -239,7 +239,7 @@ function updateState() {
     }
   })
 
-  // If motionDetector has triggered (domoticz), turn it YELLOW, otherwise make it BLACK
+  // If motionDetector has triggered (domoticz), turn it WHITE, otherwise make it BLACK
   var domoticz_query = {
     index: 'domoticz*',
     type: 'notification',
