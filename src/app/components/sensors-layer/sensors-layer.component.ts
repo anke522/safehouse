@@ -7,7 +7,7 @@ const SENSOR_COLORS_BY_STATUS = {
   ENGAGED: Cesium.Color.GREEN.withAlpha(0.9),
   WARNING: Cesium.Color.YELLOW.withAlpha(0.9),
   COMPROMISED: Cesium.Color.RED.withAlpha(0.9),
-  NORMAL: Cesium.Color.WHITE.withAlpha(0.9),
+  NORMAL: Cesium.Color.WHITE,
 };
 
 @Component({
