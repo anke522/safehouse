@@ -91,7 +91,7 @@ export class SafehouseStore {
     })).switchMap(({data}) => Observable.from(Array.isArray(data['safehouse'].sensors) ? data['safehouse'].sensors : []));
   }
 
-  listenToSensors(pollInterval?: number): Observable<Sensor> {
+  listenToSensors(pollInterval?: number): Observable<Sensor[]> {
     return Observable.create(observer => {
       const subscription = this._client.watchQuery({
         pollInterval: pollInterval || 1000,
@@ -114,6 +114,12 @@ export class SafehouseStore {
                 }
                 related {
                   id
+                  status
+                  position {
+                    lat
+                    lon
+                    alt
+                  }
                 }
               }
             }
@@ -121,8 +127,7 @@ export class SafehouseStore {
         `
       }).subscribe(({data}) => {
         const sensors = Array.isArray(data['safehouse'].sensors) ? data['safehouse'].sensors : [];
-
-        sensors.forEach(sensor => observer.next(sensor));
+        observer.next(sensors)
       });
     });
   }

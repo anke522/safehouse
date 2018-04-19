@@ -19,5 +19,11 @@ export interface Sensor {
   position: Position;
   message: string;
   name: string;
-  related: string[];
+  related: RelatedSensor[];
+}
+
+export interface RelatedSensor {
+  id: string;
+  status: SensorStatus;
+  position: Position;
 }
