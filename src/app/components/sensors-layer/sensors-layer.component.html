@@ -1,7 +1,7 @@
 <ac-layer acFor="let sensor of sensors$" [context]="this">
   <ac-html-desc props="{position: sensor.position, show: sensor.showMessage}">
     <ng-template let-html>
-      <h3 class="sensor-message">{{sensor.message}}</h3>
+      <h4 class="sensor-message">{{sensor.message}}</h4>
     </ng-template>
   </ac-html-desc>
   <ac-box-desc props="{
@@ -14,4 +14,11 @@
 														outlineColor: Cesium.Color.BLACK
 												 }">
   </ac-box-desc>
+  <ac-array-desc acFor="let connection of sensor.connections" [idGetter]="connectionIdGetter">
+    <ac-polyline-desc props="{
+      width : 4,
+      positions: connection.positions,
+      material: connection.material
+    }"></ac-polyline-desc>
+  </ac-array-desc>
 </ac-layer>
