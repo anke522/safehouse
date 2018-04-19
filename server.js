@@ -298,7 +298,8 @@ function updateState() {
   es.search(sfalgo_query).then(function (resp) {
     var hits = (resp.hits && resp.hits.hits.length) || 0;
     if(hits > 0) { console.log(`${hits} ` + JSON.stringify(sfalgo_query)) }
-    state["safehouse"]["color"] = ( hits > 0 ? "RED" : "WHITE" )
+    var seconds = Math.floor(new Date().getTime() / 1000);
+    state["safehouse"]["color"] = ( (hits > 0 ) && ( seconds % 2 == 0 )   ? "RED" : "WHITE" )
   }, function (err) {
     if(err) {
       console.trace(err.message);
