@@ -11,7 +11,7 @@ const accessPoint: Sensor = {
     lat: 27.9561611 + 0.0000269,
     alt: 2.0
   },
-  related: ['door-camera']
+  related: ['door-camera', 'door-lock', 'motion-detector']
 };
 
 export interface AccessPoint {

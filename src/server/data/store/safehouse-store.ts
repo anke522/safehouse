@@ -1,4 +1,4 @@
-import { Building, BuildingStatus, Sensor, Position } from '../models';
+import { Building, BuildingStatus, Position, Sensor, SensorStatus } from '../models';
 
 export class SafehouseStore {
 
@@ -33,15 +33,47 @@ export class SafehouseStore {
   addOrUpdateSensor(sensor: Sensor) {
     const result = this._sensors.find(x => x.id === sensor.id);
 
+    const originalNewStauts = sensor.status;
+    delete sensor.status;
     if (result) {
       Object.assign(result, sensor);
     }
     else {
       this._sensors.push(sensor);
     }
+
+    this.updateSensorStatus(sensor, originalNewStauts);
+
+    this._sensors.forEach(s => {
+        if (this.isSensorsRelated(s, sensor)) {
+          if(s.status >= SensorStatus.Warning && sensor.status >= SensorStatus.Warning) {
+            s.combinedStatus = SensorStatus.Compromised;
+            sensor.combinedStatus = SensorStatus.Compromised;
+          } else if (s.status >= SensorStatus.Warning || sensor.status >= SensorStatus.Warning){
+            s.combinedStatus = Math.max(s.status, sensor.status);
+            sensor.combinedStatus = Math.max(s.status, sensor.status);
+          }
+        }
+      }
+    );
   }
 
   updateSafehouseStatus(status: BuildingStatus) {
-    this._status = status;
+    if (this._status < status) {
+      this._status = status;
+    }
+  }
+
+  private isSensorsRelated(sensor1: Sensor, sensor2: Sensor): boolean {
+    return sensor1.related.findIndex(s => s === sensor2.id) >= 0;
+  }
+
+  private updateSensorStatus(sensor: Sensor, status: SensorStatus): SensorStatus | undefined {
+    if (sensor.status <= 1 || sensor.status < status) {
+      sensor.status = status;
+      return status;
+    }
+
+    return undefined;
   }
 }
