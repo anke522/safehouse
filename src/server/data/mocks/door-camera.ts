@@ -1,5 +1,6 @@
 import { SensorStatus, SensorType, Position, Sensor } from '../models';
 
+
 const doorCamera: Sensor = {
   id: 'door-camera',
   type: SensorType.Camera,
@@ -7,8 +8,8 @@ const doorCamera: Sensor = {
   status: SensorStatus.Normal,
   message: '',
   position: {
-    lat: -82.4374612,
-    lon: 27.9561761,
+    lon: -82.4374762,
+    lat: 27.9561611 + 0.0000150,
     alt: 2.6,
   },
   related: ['access-point']

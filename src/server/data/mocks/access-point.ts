@@ -7,8 +7,8 @@ const accessPoint: Sensor = {
   status: SensorStatus.Normal,
   message: '',
   position: {
-    lat: -82.4374333,
-    lon: 27.956188,
+    lon: -82.4374762 +  0.0000279,
+    lat: 27.9561611 + 0.0000269,
     alt: 2.0
   },
   related: ['door-camera']
