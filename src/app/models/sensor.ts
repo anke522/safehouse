@@ -6,10 +6,10 @@ export enum SensorType {
 }
 
 export enum SensorStatus {
-  Normal = 'NORMAL',
-  Warning = 'WARNING',
-  Critical = 'CRITICAL',
-  Compromised = 'COMPROMISED',
+  Normal = 'Normal',
+  Engaged = 'Engaged',
+  Warning = 'Warning',
+  Compromised = 'Compromised'
 }
 
 export interface Sensor {

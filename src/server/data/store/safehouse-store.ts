@@ -33,8 +33,10 @@ export class SafehouseStore {
   addOrUpdateSensor(sensor: Sensor) {
     const result = this._sensors.find(x => x.id === sensor.id);
 
-    const originalNewStauts = sensor.status;
+    const originalNewStatus = sensor.status;
+    const originalNewMessage = sensor.message;
     delete sensor.status;
+    delete sensor.message;
     if (result) {
       Object.assign(result, sensor);
     }
@@ -42,7 +44,7 @@ export class SafehouseStore {
       this._sensors.push(sensor);
     }
 
-    this.updateSensorStatus(sensor, originalNewStauts);
+    this.updateSensorStatus(sensor, originalNewStatus, originalNewMessage);
 
     this._sensors.forEach(s => {
         if (this.isSensorsRelated(s, sensor)) {
@@ -68,9 +70,10 @@ export class SafehouseStore {
     return sensor1.related.findIndex(s => s === sensor2.id) >= 0;
   }
 
-  private updateSensorStatus(sensor: Sensor, status: SensorStatus): SensorStatus | undefined {
+  private updateSensorStatus(sensor: Sensor, status: SensorStatus, message: string): SensorStatus | undefined {
     if (sensor.status <= 1 || sensor.status < status) {
       sensor.status = status;
+      sensor.message = message;
       return status;
     }
 

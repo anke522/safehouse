@@ -2,6 +2,7 @@ import { Position } from './position';
 
 export enum SensorType {
   Camera = 'CAMERA',
+  MotionDetector = 'MOTION_DETECTOR',
   AccessPoint = 'ACCESS_POINT',
   DoorLock = 'DOOR_LOCK',
   Alexa = 'ALEXA',
