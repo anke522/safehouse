@@ -4,9 +4,10 @@ import { Observable } from "rxjs/Observable";
 import { SafehouseStore } from "../../services/safehouse-store.service";
 
 const SENSOR_COLORS_BY_STATUS = {
-  NORMAL: Cesium.Color.GREEN.withAlpha(0.5),
+  ENGAGED: Cesium.Color.GREEN.withAlpha(0.5),
   WARNING: Cesium.Color.YELLOW.withAlpha(0.5),
-  CRITICAL: Cesium.Color.RED.withAlpha(0.5)
+  COMPROMISED: Cesium.Color.RED.withAlpha(0.5),
+  NORMAL: Cesium.Color.WHITE.withAlpha(0.5),
 };
 
 @Component({
