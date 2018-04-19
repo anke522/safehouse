@@ -22,7 +22,7 @@ export class SensorsListener {
       type: 'webhook',
       body: {
         query: {
-          range: { timestamp: { gte: 'now-15s', lt: 'now' } }
+          range: { timestamp: { gte: 'now-60s', lt: 'now' } }
         }
       }
     }, pollInterval).map(resp => {
@@ -58,7 +58,7 @@ export class SensorsListener {
       type: 'webhook',
       body: {
         query: {
-          range: { timestamp: { gte: 'now-10s', lt: 'now' } }
+          range: { timestamp: { gte: 'now-60s', lt: 'now' } }
         }
       }
     }, pollInterval).map(resp => {
@@ -104,7 +104,7 @@ export class SensorsListener {
         query: {
           bool: {
             must: { match: { user: 'Manual Unlock' } },
-            filter: [{ range: { timestamp: { gte: 'now-10s', lt: 'now' } } }]
+            filter: [{ range: { timestamp: { gte: 'now-60s', lt: 'now' } } }]
           }
         }
       }
@@ -125,7 +125,7 @@ export class SensorsListener {
         query: {
           bool: {
             must: { match: { user: 'Manual Unlock' } },
-            filter: [{ range: { timestamp: { gte: 'now-10s', lt: 'now' } } }]
+            filter: [{ range: { timestamp: { gte: 'now-60s', lt: 'now' } } }]
           }
         }
       }
