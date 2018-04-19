@@ -7,8 +7,8 @@ const motionDetector: Sensor = {
   status: SensorStatus.Normal,
   message: '',
   position: {
-    lat: -82.4374272,
-    lon: 27.9561921,
+    lon: -82.4374762 + 0.0000340,
+    lat: 27.9561611 + 0.0000310,
     alt: 1.2,
   },
   related: ['access-point']

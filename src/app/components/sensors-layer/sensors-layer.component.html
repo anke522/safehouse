@@ -1,0 +1,17 @@
+<ac-layer acFor="let sensor of sensors$" [context]="this">
+  <ac-html-desc props="{position: sensor.position, show: sensor.showMessage}">
+    <ng-template let-html>
+      <h3 class="sensor-message">{{sensor.message}}</h3>
+    </ng-template>
+  </ac-html-desc>
+  <ac-box-desc props="{
+                            name: sensor.name,
+                            dimensions: boxDimensions,
+														position: sensor.position,
+														material: sensor.color,
+														outline : true,
+														outlineWidth: 8,
+														outlineColor: Cesium.Color.BLACK
+												 }">
+  </ac-box-desc>
+</ac-layer>

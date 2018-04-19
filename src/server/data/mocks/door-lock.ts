@@ -7,8 +7,8 @@ const doorLock: Sensor = {
   status: SensorStatus.Normal,
   message: '',
   position: {
-    lat: -82.4374612,
-    lon: 27.9561791,
+    lon: -82.4374762 ,
+    lat: 27.9561611 + 0.0000180,
     alt: 1.2,
   },
   related: ['access-point']
