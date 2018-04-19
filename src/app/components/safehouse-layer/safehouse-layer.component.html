@@ -1,4 +1,4 @@
-<ac-layer acFor="let building of buildings$" [context]="this">
+<ac-layer #layer acFor="let building of buildings$" [context]="this">
   <ac-model-desc (onDraw)="initialFlyTo($event)" props="{
 														position: building.position,
 														minimumPixelSize: 100,

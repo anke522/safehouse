@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { AcNotification, ActionType, CesiumService } from 'angular-cesium';
+import { AcLayerComponent, AcNotification, ActionType, CesiumService } from 'angular-cesium';
 import { SafehouseStore } from '../../services/safehouse-store.service';
-import { BuildingStatus } from "../../models/building";
-import { AlertService } from "./alert.service";
+import { BuildingStatus } from '../../models/building';
+import { AlertService } from './alert.service';
 
 const BUILDING_COLORS = {
   NORMAL: Cesium.Color.WHITE.withAlpha(0.5),
@@ -20,29 +20,44 @@ export class SafehouseLayer {
   Cesium = Cesium;
   buildings$: Observable<AcNotification>;
   didFlyTo = false;
+  buildCompromisedColorInterval;
+  @ViewChild('layer') private layer: AcLayerComponent;
 
   constructor(safehouseStore: SafehouseStore,
               private cesiumService: CesiumService,
               private alertService: AlertService) {
 
     this.buildings$ = safehouseStore.listenToBuildingInfo()
-      .do(building=> {
+      .do(building => {
         if (building.status === BuildingStatus.Compromised) {
           this.alertService.playAlert();
+          if (!this.buildCompromisedColorInterval) {
+            this.startBuildingCompromisedInterval(building);
+          }
         }
-        console.log(building.status);
       })
       .map(building => ({
-      id: building.id,
-      actionType: ActionType.ADD_UPDATE,
-      entity: Object.assign({}, building, {
-        position: Cesium.Cartesian3.fromDegrees(building.position.lon, building.position.lat, building.position.alt),
-        color: building.status === BuildingStatus.Compromised ? BUILDING_COLORS.COMPROMISED : BUILDING_COLORS.NORMAL,
-      })
-    }));
+        id: building.id,
+        actionType: ActionType.ADD_UPDATE,
+        entity: Object.assign({}, building, {
+          position: Cesium.Cartesian3.fromDegrees(building.position.lon, building.position.lat, building.position.alt),
+          color: building.status === BuildingStatus.Compromised ? BUILDING_COLORS.COMPROMISED : BUILDING_COLORS.NORMAL,
+        })
+      }));
   }
 
-  async initialFlyTo({cesiumEntity}) {
+  startBuildingCompromisedInterval(building) {
+    let color = BUILDING_COLORS.COMPROMISED;
+    this.buildCompromisedColorInterval = setInterval(() => {
+      color = color === BUILDING_COLORS.COMPROMISED ? BUILDING_COLORS.NORMAL : BUILDING_COLORS.COMPROMISED;
+      this.layer.update(Object.assign({}, building, {
+        position: Cesium.Cartesian3.fromDegrees(building.position.lon, building.position.lat, building.position.alt),
+        color,
+      }), building.id);
+    }, 1000);
+  }
+
+  async initialFlyTo({ cesiumEntity }) {
     if (!this.didFlyTo) {
       const viewer = this.cesiumService.getViewer();
       await viewer.flyTo(cesiumEntity);
