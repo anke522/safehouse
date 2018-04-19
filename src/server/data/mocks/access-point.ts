@@ -1,30 +1,33 @@
-import { SensorStatus, SensorType, Position } from '../models';
+import { SensorStatus, SensorType, Position, Sensor } from '../models';
 
-const accessPoint = {
+const accessPoint: Sensor = {
   id: 'access-point',
   type: SensorType.AccessPoint,
+  name: 'Access Point',
   status: SensorStatus.Normal,
   message: '',
   position: {
-    lat: 0,
-    lon: 0,
-    alt: 0
+    lat: -82.4374333,
+    lon: 27.956188,
+    alt: 2.0
   },
   related: ['door-camera']
 };
 
-export interface AccessPointOptions {
+export interface AccessPoint {
   id?: string;
   type?: SensorType;
+  name?: string;
   status?: SensorStatus;
   position?: Position;
   message?: string;
   related?: string[];
 }
 
-export const getAccessPoint = ({id, type, status, message, position, related}: AccessPointOptions = {}) => ({
+export const getAccessPoint = ({id, type, name, status, message, position, related}: AccessPoint = {}): Sensor => ({
   id: id || accessPoint.id,
   type: type || accessPoint.type,
+  name: name || accessPoint.name,
   status: status || accessPoint.status,
   message: message || accessPoint.message,
   related: related || accessPoint.related.slice(0),

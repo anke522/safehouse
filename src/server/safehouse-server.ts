@@ -30,6 +30,9 @@ const sensorsListener = new SensorsListener(elasticWatcher);
 
 sensorsListener.listenToAccessPoint(1000).subscribe(accessPoint => context.safehouseStore.addOrUpdateSensor(accessPoint));
 sensorsListener.listenToDoorCamera(1000).subscribe(doorCamera => context.safehouseStore.addOrUpdateSensor(doorCamera));
+sensorsListener.listenToMotionDetector(1000).subscribe(motionDetector => context.safehouseStore.addOrUpdateSensor(motionDetector));
+sensorsListener.listenToDoorLock(1000).subscribe(doorLock => context.safehouseStore.addOrUpdateSensor(doorLock));
+sensorsListener.listenToSafehouseState(1000).subscribe(state => context.safehouseStore.updateSafehouseStatus(state));
 
 const app = express();
 

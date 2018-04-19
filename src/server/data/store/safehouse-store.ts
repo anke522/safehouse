@@ -40,4 +40,8 @@ export class SafehouseStore {
       this._sensors.push(sensor);
     }
   }
+
+  updateSafehouseStatus(status: BuildingStatus) {
+    this._status = status;
+  }
 }
