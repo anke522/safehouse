@@ -6,12 +6,14 @@ import { SafehouseStore } from './services/safehouse-store.service';
 
 import { AppComponent } from './app.component';
 import { SafehouseLayer } from './components/safehouse-layer/safehouse-layer.component';
+import { SensorsLayerComponent } from './components/sensors-layer/sensors-layer.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    SafehouseLayer
+    SafehouseLayer,
+    SensorsLayerComponent
   ],
   imports: [
     BrowserModule,
