@@ -4,10 +4,10 @@ import { Observable } from "rxjs/Observable";
 import { SafehouseStore } from "../../services/safehouse-store.service";
 
 const SENSOR_COLORS_BY_STATUS = {
-  ENGAGED: Cesium.Color.GREEN.withAlpha(0.5),
-  WARNING: Cesium.Color.YELLOW.withAlpha(0.5),
-  COMPROMISED: Cesium.Color.RED.withAlpha(0.5),
-  NORMAL: Cesium.Color.WHITE.withAlpha(0.5),
+  ENGAGED: Cesium.Color.GREEN.withAlpha(0.9),
+  WARNING: Cesium.Color.YELLOW.withAlpha(0.9),
+  COMPROMISED: Cesium.Color.RED.withAlpha(0.9),
+  NORMAL: Cesium.Color.WHITE.withAlpha(0.9),
 };
 
 @Component({
@@ -21,16 +21,14 @@ export class SensorsLayerComponent implements OnInit {
   sensors$: Observable<AcNotification>;
 
   constructor(safehouseStore: SafehouseStore) {
-
-    this.sensors$ = safehouseStore.listenToSensors()
-      .do(x => console.log(x))
+    this.sensors$ = safehouseStore.listenToSensors(1000)
       .map(sensor => ({
         id: sensor.id,
         actionType: ActionType.ADD_UPDATE,
         entity: Object.assign({}, sensor, {
           position: Cesium.Cartesian3.fromDegrees(sensor.position.lon, sensor.position.lat, sensor.position.alt),
           color: SENSOR_COLORS_BY_STATUS[sensor.status] || SENSOR_COLORS_BY_STATUS.NORMAL,
-          type: sensor.type,
+          name: `${sensor.type}, status: ${sensor.status}`,
           showMessage: sensor.message && sensor.message.length !== 0,
           message: sensor.message,
         })
