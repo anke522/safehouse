@@ -12,7 +12,22 @@ export class AppComponent {
   title = 'app';
   MapLayerProviderOptions = MapLayerProviderOptions;
 
-  constructor(viewerConfig: ViewerConfiguration){
-    viewerConfig.viewerOptions = {baseLayerPicker : true, geocoder : false,}
+  constructor(viewerConfig: ViewerConfiguration) {
+    viewerConfig.viewerOptions = {
+      selectionIndicator : false,
+      timeline : false,
+      infoBox : false,
+      baseLayerPicker : false,
+      animation : false,
+      homeButton : false,
+      geocoder : false,
+      navigationHelpButton : false,
+      navigationInstructionsInitiallyVisible : false,
+    };
+
+    viewerConfig.viewerModifier = (viewer: any) => {
+      viewer.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+      viewer.bottomContainer.remove();
+    };
   }
 }
