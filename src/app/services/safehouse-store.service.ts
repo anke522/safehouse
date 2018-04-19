@@ -40,9 +40,11 @@ export class SafehouseStore {
     });
   }
 
-  getBuildingInfo(): Observable<Building> {
-    return Observable.fromPromise(this._client.query({
-      query: gql`
+  listenToBuildingInfo(pollInterval = 1000):  Observable<Building> {
+    return Observable.create(observer=>{
+      this._client.watchQuery<any>({
+        pollInterval,
+        query: gql`
           query safehouse {
             safehouse {
               id
@@ -56,7 +58,10 @@ export class SafehouseStore {
             }
           }
         `
-    })).map(({data}) => Object.assign({}, data['safehouse'], {sensors: []}));
+      }).subscribe(result=> {
+        observer.next(result.data.safehouse)
+      })
+    });
   }
 
   getSensors(): Observable<Array<Sensor>> {
@@ -68,6 +73,7 @@ export class SafehouseStore {
               sensors {
                 id
                 type
+                name
                 status
                 message
                 position {
@@ -98,6 +104,7 @@ export class SafehouseStore {
               sensors {
                 id
                 type
+                name
                 status
                 message
                 position {

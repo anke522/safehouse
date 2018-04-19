@@ -2,26 +2,41 @@ import { Component } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { AcNotification, ActionType, CesiumService } from 'angular-cesium';
 import { SafehouseStore } from '../../services/safehouse-store.service';
+import { BuildingStatus } from "../../models/building";
+import { AlertService } from "./alert.service";
+
+const BUILDING_COLORS = {
+  NORMAL: Cesium.Color.WHITE.withAlpha(0.5),
+  COMPROMISED: Cesium.Color.RED.withAlpha(0.5),
+}
 
 @Component({
   selector: 'safehouse-layer',
   templateUrl: './safehouse-layer.component.html',
-  styleUrls: ['./safehouse-layer.component.css']
+  styleUrls: ['./safehouse-layer.component.css'],
+  providers: [AlertService],
 })
 export class SafehouseLayer {
   Cesium = Cesium;
   buildings$: Observable<AcNotification>;
   didFlyTo = false;
 
-  constructor(safehouseStore: SafehouseStore, private cesiumService: CesiumService) {
+  constructor(safehouseStore: SafehouseStore,
+              private cesiumService: CesiumService,
+              private alertService: AlertService) {
 
-    // safehouseStore.listenToSensors().subscribe(x => console.log('xxxxxxxxxxxxxxxxx => ', x));
-
-    this.buildings$ = safehouseStore.getBuildingInfo().map(building => ({
+    this.buildings$ = safehouseStore.listenToBuildingInfo()
+      .do(building=> {
+        if (building.status === BuildingStatus.Compromised) {
+          this.alertService.playAlert();
+        }
+      })
+      .map(building => ({
       id: building.id,
       actionType: ActionType.ADD_UPDATE,
       entity: Object.assign({}, building, {
-        position: Cesium.Cartesian3.fromDegrees(building.position.lon, building.position.lat, building.position.alt)
+        position: Cesium.Cartesian3.fromDegrees(building.position.lon, building.position.lat, building.position.alt),
+        color: building.status === BuildingStatus.Compromised ? BUILDING_COLORS.COMPROMISED : BUILDING_COLORS.NORMAL,
       })
     }));
   }
