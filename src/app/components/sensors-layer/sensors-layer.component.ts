@@ -3,8 +3,6 @@ import { AcNotification, ActionType } from "angular-cesium";
 import { Observable } from "rxjs/Observable";
 import { SafehouseStore } from "../../services/safehouse-store.service";
 
-console.log(Cesium);
-
 const SENSOR_COLORS_BY_STATUS = {
   NORMAL: Cesium.Color.GREEN.withAlpha(0.5),
   WARNING: Cesium.Color.YELLOW.withAlpha(0.5),
