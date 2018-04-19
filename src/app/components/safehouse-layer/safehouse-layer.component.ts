@@ -9,13 +9,13 @@ import { SafehouseStore } from '../../services/safehouse-store.service';
   styleUrls: ['./safehouse-layer.component.css']
 })
 export class SafehouseLayer {
-
+  Cesium = Cesium;
   buildings$: Observable<AcNotification>;
   didFlyTo = false;
 
   constructor(safehouseStore: SafehouseStore, private cesiumService: CesiumService) {
-    safehouseStore.getSensors().subscribe(x => console.log('xxxxxxxxxxxxxxxxx => ', x));
-    safehouseStore.listenToSensors().subscribe(x => console.log('xxxxxxxxxxxxxxxxx => ', x));
+
+    // safehouseStore.listenToSensors().subscribe(x => console.log('xxxxxxxxxxxxxxxxx => ', x));
 
     this.buildings$ = safehouseStore.getBuildingInfo().map(building => ({
       id: building.id,
@@ -34,5 +34,4 @@ export class SafehouseLayer {
       this.didFlyTo = true;
     }
   }
-
 }

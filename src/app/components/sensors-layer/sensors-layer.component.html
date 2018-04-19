@@ -1,0 +1,11 @@
+<ac-layer acFor="let sensor of sensors$" [context]="this">
+  <ac-box-desc  props="{
+                            dimensions: boxDimensions,
+														position: sensor.position,
+														material: sensor.color,
+														outline : true,
+														outlineWidth: 8,
+														outlineColor: Cesium.Color.BLACK
+												 }">
+  </ac-box-desc>
+</ac-layer>

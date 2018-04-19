@@ -85,7 +85,7 @@ export class SafehouseStore {
     })).switchMap(({data}) => Observable.from(Array.isArray(data['safehouse'].sensors) ? data['safehouse'].sensors : []));
   }
 
-  listenToSensors(pollInterval?: number): Observable<Array<Sensor>> {
+  listenToSensors(pollInterval?: number): Observable<Sensor> {
     return Observable.create(observer => {
       const subscription = this._client.watchQuery({
         pollInterval: pollInterval || 1000,
