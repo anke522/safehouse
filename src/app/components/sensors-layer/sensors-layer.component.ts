@@ -30,10 +30,6 @@ export class SensorsLayerComponent implements OnInit {
     });
   }
 
-  connectionIdGetter(entity: any): string {
-    return entity.id;
-  }
-
   createConnection(sensor, relatedSensor, dashedColor) {
     return {
       id: `${sensor.id}:${relatedSensor.id}`,
@@ -89,7 +85,7 @@ export class SensorsLayerComponent implements OnInit {
             name: `${sensor.name}, status: ${sensor.status}`,
             showMessage: sensor.message && sensor.message.length !== 0,
             message: sensor.message,
-            connections: this.sensorConnectionsMap.get(sensor.id),
+            connections: this.sensorConnectionsMap.get(sensor.id) || [],
           })
         })
       )

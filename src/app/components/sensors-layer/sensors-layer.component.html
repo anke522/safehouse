@@ -24,7 +24,7 @@
 														outlineColor: Cesium.Color.BLACK
 												 }">
   </ac-box-desc>
-  <ac-array-desc acFor="let connection of sensor.connections" [idGetter]="connectionIdGetter">
+  <ac-array-desc acFor="let connection of sensor.connections">
     <ac-polyline-desc props="{
       width : 4,
       positions: connection.positions,
