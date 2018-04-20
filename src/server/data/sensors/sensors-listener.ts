@@ -28,9 +28,10 @@ export class SensorsListener {
     }, pollInterval).map(resp => {
       const hits = (resp.hits && resp.hits.hits.length) || 0;
 
+      const random = Math.random();
       return getAccessPoint({
-        status: Math.random() > 0.5 ? SensorStatus.Warning : SensorStatus.Normal,
-        message: Math.random() > 0.5 ? 'Unknown client attached to access point' : ''
+        status: random > 0.5 ? SensorStatus.Warning : SensorStatus.Normal,
+        message: random > 0.5 ? 'Unknown client attached to access point' : ''
       });
     });
   }

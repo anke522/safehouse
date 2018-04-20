@@ -31,7 +31,7 @@ export class SafehouseStore {
   }
 
   addOrUpdateSensor(sensorUpdate: Sensor) {
-    const sensor = this._sensors.find(x => x.id === sensor.id) || sensorUpdate;
+    const sensor = this._sensors.find(x => x.id === sensorUpdate.id) || sensorUpdate;
     const originalNewStatus = sensorUpdate.status;
     const originalNewMessage = sensorUpdate.message;
 
