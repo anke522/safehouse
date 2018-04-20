@@ -1,0 +1,11 @@
+<ac-layer #layer acFor="let building of buildings$" [context]="this">
+  <ac-model-desc (onDraw)="initialFlyTo($event)" props="{
+														position: building.position,
+														name: 'Safe House',
+														colorBlendMode: Cesium.ColorBlendMode.HIGHLIGHT,
+														colorBlendAmount: 0.5,
+														uri: '/assets/models/safehouse.glb',
+														color: building.color
+												 }">
+  </ac-model-desc>
+</ac-layer>

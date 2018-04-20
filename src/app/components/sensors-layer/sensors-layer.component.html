@@ -1,0 +1,35 @@
+<ac-layer acFor="let sensor of sensors$" [context]="this">
+  <ac-label-desc props="{
+    text: sensor.message,
+    position: sensor.position,
+    font: '100px sans-serif',
+    scale: 0.2,
+    showBackground : true,
+    horizontalOrigin : Cesium.HorizontalOrigin.CENTER,
+    pixelOffset : labelOffset,
+    translucencyByDistance: labelFadeByDistance
+  }">
+  </ac-label-desc>
+  <!--<ac-html-desc props="{position: sensor.position, show: sensor.showMessage}">-->
+  <!--<ng-template let-html>-->
+  <!--<h4 class="sensor-message">{{sensor.message}}</h4>-->
+  <!--</ng-template>-->
+  <!--</ac-html-desc>-->
+  <ac-box-desc props="{
+                            dimensions: boxDimensions,
+                            name: sensor.name,
+														position: sensor.position,
+														material: sensor.color,
+														outline : true,
+														outlineWidth: 8,
+														outlineColor: Cesium.Color.BLACK
+												 }">
+  </ac-box-desc>
+  <ac-array-desc acFor="let connection of sensor.connections">
+    <ac-polyline-desc props="{
+      width : 4,
+      positions: connection.positions,
+      material: connection.material
+    }"></ac-polyline-desc>
+  </ac-array-desc>
+</ac-layer>
