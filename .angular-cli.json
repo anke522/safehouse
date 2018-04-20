@@ -11,7 +11,7 @@
         "assets",
         "assets/models",
         "favicon.ico",
-        { "glob": "**/*", "input": "../node_modules/cesium/Build/Cesium", "output": "./" }
+        { "glob": "**/*", "input": "../node_modules/cesium/Build/Cesium", "output": "./assets/cesium" }
       ],
       "index": "index.html",
       "main": "main.ts",
