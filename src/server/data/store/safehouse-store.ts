@@ -30,31 +30,31 @@ export class SafehouseStore {
     return this._sensors.find(sensor => sensor.id === id);
   }
 
-  addOrUpdateSensor(sensor: Sensor) {
-    const resultSensor = this._sensors.find(x => x.id === sensor.id) || sensor;
-    const originalNewStatus = sensor.status;
-    const originalNewMessage = sensor.message;
+  addOrUpdateSensor(sensorUpdate: Sensor) {
+    const sensor = this._sensors.find(x => x.id === sensor.id) || sensorUpdate;
+    const originalNewStatus = sensorUpdate.status;
+    const originalNewMessage = sensorUpdate.message;
 
-    if (resultSensor !== sensor) {
-      delete sensor.message;
-      delete sensor.status;
-      Object.assign(resultSensor, sensor);
+    if (sensor !== sensorUpdate) {
+      delete sensorUpdate.message;
+      delete sensorUpdate.status;
+      Object.assign(sensor, sensorUpdate);
     }
     else {
       this._sensors.push(sensor);
     }
 
-    this.updateSensorStatus(resultSensor, originalNewStatus, originalNewMessage);
+    this.updateSensorStatus(sensor, originalNewStatus, originalNewMessage);
 
     this._sensors.forEach(s => {
-        if (this.isSensorsRelated(s, resultSensor)) {
-          if (s.status >= SensorStatus.Warning && resultSensor.status >= SensorStatus.Warning) {
+        if (this.isSensorsRelated(s, sensor)) {
+          if (s.status >= SensorStatus.Warning && sensor.status >= SensorStatus.Warning) {
             s.combinedStatus = SensorStatus.Compromised;
-            resultSensor.combinedStatus = SensorStatus.Compromised;
+            sensor.combinedStatus = SensorStatus.Compromised;
           }
-          // else if (s.status >= SensorStatus.Warning || resultSensor.status >= SensorStatus.Warning) {
-          //   s.combinedStatus = Math.max(s.status, resultSensor.status);
-          //   resultSensor.combinedStatus = Math.max(s.status, resultSensor.status);
+          // else if (s.status >= SensorStatus.Warning || sensorUpdate.status >= SensorStatus.Warning) {
+          //   s.combinedStatus = Math.max(s.status, sensorUpdate.status);
+          //   sensorUpdate.combinedStatus = Math.max(s.status, sensorUpdate.status);
           // }
         }
       }
