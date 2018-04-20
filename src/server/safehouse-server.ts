@@ -4,6 +4,7 @@ import * as bodyParser from 'body-parser';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import { makeExecutableSchema } from 'graphql-tools';
 
+import { environment } from '../environments/environment';
 import * as types from './data/gql/types';
 import * as allResolvers from './data/gql/resolvers';
 import { createSafehouseContext } from './data/gql/context';
@@ -22,8 +23,8 @@ const schema = makeExecutableSchema({
 const context = createSafehouseContext(getSafeHouse());
 
 const elasticWatcher = new ElasticWatcher({
-  host: '',
-  httpAuth: ''
+  host: environment.es_url || 'http://localhost:9200',
+  httpAuth: environment.es_http_auth
 });
 
 const sensorsListener = new SensorsListener(elasticWatcher);
