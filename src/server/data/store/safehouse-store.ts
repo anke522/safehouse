@@ -42,6 +42,7 @@ export class SafehouseStore {
     }
     else {
       this._sensors.push(sensor);
+      sensor.lastStatusUpdate = Date.now();
     }
 
     this.updateSensorStatus(sensor, originalNewStatus, originalNewMessage);
@@ -72,9 +73,11 @@ export class SafehouseStore {
   }
 
   private updateSensorStatus(sensor: Sensor, status: SensorStatus, message: string) {
-    if (sensor.status <= 1 || sensor.status <= status) {
+    if (sensor.status <= status ||
+      (sensor.status < 2 && sensor.status > status && Date.now() - sensor.lastStatusUpdate > 2000)) {
       sensor.status = status;
       sensor.message = message;
+      sensor.lastStatusUpdate = Date.now();
     }
   }
 }
