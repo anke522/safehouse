@@ -42,3 +42,8 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+# dotenv generated .env file
+.env
+./src/environments/environment*.ts
+
