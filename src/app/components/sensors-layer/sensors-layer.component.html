@@ -1,11 +1,21 @@
 <ac-layer acFor="let sensor of sensors$" [context]="this">
-  <ac-html-desc props="{position: sensor.position, show: sensor.showMessage}">
-    <ng-template let-html>
-      <h4 class="sensor-message">{{sensor.message}}</h4>
-    </ng-template>
-  </ac-html-desc>
+  <ac-label-desc props="{
+    text: sensor.message,
+    position: sensor.position,
+    font: '100px sans-serif',
+    scale: 0.2,
+    showBackground : true,
+    horizontalOrigin : Cesium.HorizontalOrigin.CENTER,
+    pixelOffset : labelOffset,
+    translucencyByDistance: labelFadeByDistance
+  }">
+  </ac-label-desc>
+  <!--<ac-html-desc props="{position: sensor.position, show: sensor.showMessage}">-->
+  <!--<ng-template let-html>-->
+  <!--<h4 class="sensor-message">{{sensor.message}}</h4>-->
+  <!--</ng-template>-->
+  <!--</ac-html-desc>-->
   <ac-box-desc props="{
-                            name: sensor.name,
                             dimensions: boxDimensions,
 														position: sensor.position,
 														material: sensor.color,

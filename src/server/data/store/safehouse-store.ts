@@ -1,4 +1,4 @@
-import { Building, BuildingStatus, Position, Sensor, SensorStatus } from '../models';
+import { Building, BuildingStatus, Position, Sensor, SensorStatus, SensorType } from '../models';
 
 export class SafehouseStore {
 
@@ -30,31 +30,33 @@ export class SafehouseStore {
     return this._sensors.find(sensor => sensor.id === id);
   }
 
-  addOrUpdateSensor(sensor: Sensor) {
-    const result = this._sensors.find(x => x.id === sensor.id);
+  addOrUpdateSensor(sensorUpdate: Sensor) {
+    const sensor = this._sensors.find(x => x.id === sensorUpdate.id) || sensorUpdate;
+    const originalNewStatus = sensorUpdate.status;
+    const originalNewMessage = sensorUpdate.message;
 
-    const originalNewStatus = sensor.status;
-    const originalNewMessage = sensor.message;
-    delete sensor.status;
-    delete sensor.message;
-    if (result) {
-      Object.assign(result, sensor);
+    if (sensor !== sensorUpdate) {
+      delete sensorUpdate.message;
+      delete sensorUpdate.status;
+      Object.assign(sensor, sensorUpdate);
     }
     else {
       this._sensors.push(sensor);
+      sensor.lastStatusUpdate = Date.now();
     }
 
     this.updateSensorStatus(sensor, originalNewStatus, originalNewMessage);
 
     this._sensors.forEach(s => {
         if (this.isSensorsRelated(s, sensor)) {
-          if(s.status >= SensorStatus.Warning && sensor.status >= SensorStatus.Warning) {
+          if (s.status >= SensorStatus.Warning && sensor.status >= SensorStatus.Warning) {
             s.combinedStatus = SensorStatus.Compromised;
             sensor.combinedStatus = SensorStatus.Compromised;
-          } else if (s.status >= SensorStatus.Warning || sensor.status >= SensorStatus.Warning){
-            s.combinedStatus = Math.max(s.status, sensor.status);
-            sensor.combinedStatus = Math.max(s.status, sensor.status);
           }
+          // else if (s.status >= SensorStatus.Warning || sensorUpdate.status >= SensorStatus.Warning) {
+          //   s.combinedStatus = Math.max(s.status, sensorUpdate.status);
+          //   sensorUpdate.combinedStatus = Math.max(s.status, sensorUpdate.status);
+          // }
         }
       }
     );
@@ -70,13 +72,12 @@ export class SafehouseStore {
     return sensor1.related.findIndex(s => s === sensor2.id) >= 0;
   }
 
-  private updateSensorStatus(sensor: Sensor, status: SensorStatus, message: string): SensorStatus | undefined {
-    if (sensor.status <= 1 || sensor.status < status) {
+  private updateSensorStatus(sensor: Sensor, status: SensorStatus, message: string) {
+    if (sensor.status <= status ||
+      (sensor.status < 2 && sensor.status > status && Date.now() - sensor.lastStatusUpdate > 2000)) {
       sensor.status = status;
       sensor.message = message;
-      return status;
+      sensor.lastStatusUpdate = Date.now();
     }
-
-    return undefined;
   }
 }
