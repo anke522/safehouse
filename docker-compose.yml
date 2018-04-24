@@ -1,0 +1,27 @@
+version: '2.1'
+
+services:
+
+  safehouse:
+    build:
+      context: .
+      dockerfile: Dockerfile.safehouse
+    image: sofwerx/safehouse
+    container_name: safehouse
+    hostname: safehouse
+    ports:
+      - 4200:4200
+
+  safehouse-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.safehouse-server
+    image: sofwerx/safehouse-server
+    container_name: safehouse-server
+    hostname: safehouse-server
+    environment:
+      ES_URL: ${ES_URL}
+      ES_HTTP_AUTH: ${ES_HTTP_AUTH}
+    ports:
+      - 3000:3000
+

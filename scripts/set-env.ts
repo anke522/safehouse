@@ -16,7 +16,8 @@ const envConfigFile = `
 export const environment = {
   production: ${isProd},
   es_url: "${process.env.ES_URL || 'http://localhost:9200'}",
-  es_http_auth: "${process.env.ES_HTTP_AUTH}" 
+  es_http_auth: "${process.env.ES_HTTP_AUTH}",
+  graphql_url: "${process.env.GRAPHQL_URL || '/graphql'}"
 };
 `
 writeFile(targetPath, envConfigFile, function (err) {

@@ -3,6 +3,7 @@ import 'rxjs/add/observable/fromPromise';
 import 'rxjs/add/operator/merge';
 import 'rxjs/add/operator/switchMap';
 
+import { environment } from '../../environments/environment';
 import { Injectable } from '@angular/core';
 import { ApolloClient, ObservableQuery } from 'apollo-client';
 import { InMemoryCache } from 'apollo-cache-inmemory';
@@ -33,7 +34,7 @@ export class SafehouseStore {
           if (networkError) console.log(`[Network error]: ${networkError}`);
         }),
         new HttpLink({
-          uri: 'http://localhost:3000/graphql'
+          uri: environment.graphql_url || 'http://localhost:3000/graphql'
         })
       ]),
       cache: new InMemoryCache()

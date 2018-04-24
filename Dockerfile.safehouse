@@ -1,0 +1,19 @@
+FROM node
+
+RUN mkdir -p /safehouse
+ADD package.json /safehouse
+
+WORKDIR /safehouse
+
+RUN npm install
+
+ADD . /safehouse/
+
+ENV PATH=/safehouse/node_modules/.bin:$PATH
+
+RUN npm run config -- --environment=prod
+RUN ng build
+
+EXPOSE 4200
+
+CMD ./safehouse.sh
