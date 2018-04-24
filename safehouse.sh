@@ -30,4 +30,5 @@ if [ -n "$CHANGE_SFALGO_MAPPING" ]; then
   }'
 fi
 
-exec ng serve $@
+npm run config -- --environment=${LIFECYCLE:-prod}
+exec ng serve --port ${PORT:-4200} --host ${LISTEN_ADDR:-0.0.0.0} $@

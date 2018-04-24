@@ -9,8 +9,8 @@ services:
     image: sofwerx/safehouse
     container_name: safehouse
     hostname: safehouse
-    ports:
-      - 4200:4200
+#    ports:
+#      - 4200:4200
 
   safehouse-server:
     build:
@@ -22,6 +22,6 @@ services:
     environment:
       ES_URL: ${ES_URL}
       ES_HTTP_AUTH: ${ES_HTTP_AUTH}
-    ports:
-      - 3000:3000
+#    ports:
+#      - 3000:3000
 

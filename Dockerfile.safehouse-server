@@ -5,6 +5,7 @@ ADD package.json /safehouse
 
 WORKDIR /safehouse
 
+RUN npm i -g npm
 RUN npm install
 
 ADD . /safehouse/
